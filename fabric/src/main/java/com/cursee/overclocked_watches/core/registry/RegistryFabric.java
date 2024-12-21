@@ -14,6 +14,7 @@ public class RegistryFabric {
 
     public static void register() {
         ModItemsFabric.register();
+        ModParticlesFabric.register();
         ModTabsFabric.register();
     }
 

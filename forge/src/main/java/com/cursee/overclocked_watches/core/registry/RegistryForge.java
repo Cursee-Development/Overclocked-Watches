@@ -24,11 +24,12 @@ public class RegistryForge {
     public static void register(IEventBus modEventBus) {
 
         ModItemsForge.register();
+        ModParticlesForge.register();
         ModTabsForge.register();
 
         ITEMS.register(modEventBus);
-        TABS.register(modEventBus);
         PARTICLES.register(modEventBus);
+        TABS.register(modEventBus);
     }
 
     protected static <T extends Item> RegistryObject<T> registerItem(String itemID, Supplier<T> itemSupplier) {
