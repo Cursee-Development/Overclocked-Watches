@@ -4,7 +4,9 @@ import com.cursee.overclocked_watches.client.item.RendererLayers;
 import com.cursee.overclocked_watches.client.item.RendererUtil;
 import com.cursee.overclocked_watches.client.item.model.ArmsModel;
 import com.cursee.overclocked_watches.client.item.renderer.WatchRenderer;
+import com.cursee.overclocked_watches.core.particle.custom.WatchGrowthParticle;
 import com.cursee.overclocked_watches.core.registry.ModItemsForge;
+import com.cursee.overclocked_watches.core.registry.ModParticlesForge;
 import com.cursee.overclocked_watches.mixin.LivingEntityRendererAccessor;
 import com.cursee.overclocked_watches.platform.Services;
 import net.minecraft.client.Minecraft;
@@ -13,6 +15,7 @@ import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import top.theillusivec4.curios.client.render.CuriosLayer;
@@ -26,6 +29,7 @@ public class OverclockedWatchesClientForge {
         modEventBus.addListener(this::onRegisterEntityLayerDefinitions);
         modEventBus.addListener(this::onClientSetup);
         modEventBus.addListener(this::onAddEntityRendererLayers);
+        modEventBus.addListener(this::onRegisterParticleProviders);
 
         ArmRenderHandler.setup();
     }
@@ -72,5 +76,9 @@ public class OverclockedWatchesClientForge {
             }
             livingEntityRenderer.addLayer(new CuriosLayer<>(livingEntityRenderer));
         }
+    }
+
+    public void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(ModParticlesForge.GOLDEN_WATCH_GROWTH.get(), WatchGrowthParticle.HappyVillagerParticleCopiedProvider::new);
     }
 }

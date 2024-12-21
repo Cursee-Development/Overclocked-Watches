@@ -26,6 +26,7 @@ public class WatchGrowthParticle extends TextureSheetParticle {
         return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
+    /** @see SuspendedTownParticle */
     public static class HappyVillagerParticleCopiedProvider implements ParticleProvider<SimpleParticleType> {
 
         private final SpriteSet sprites;
