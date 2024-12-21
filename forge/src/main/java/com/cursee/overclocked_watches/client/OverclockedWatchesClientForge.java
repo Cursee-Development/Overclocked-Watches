@@ -80,5 +80,7 @@ public class OverclockedWatchesClientForge {
 
     public void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(ModParticlesForge.GOLDEN_WATCH_GROWTH.get(), WatchGrowthParticle.HappyVillagerParticleCopiedProvider::new);
+        event.registerSpriteSet(ModParticlesForge.DIAMOND_WATCH_GROWTH.get(), WatchGrowthParticle.HappyVillagerParticleCopiedProvider::new);
+        event.registerSpriteSet(ModParticlesForge.NETHERITE_WATCH_GROWTH.get(), WatchGrowthParticle.HappyVillagerParticleCopiedProvider::new);
     }
 }
