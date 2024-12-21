@@ -1,5 +1,10 @@
 package com.cursee.overclocked_watches.platform.services;
 
+import com.cursee.overclocked_watches.client.item.renderer.IWatchRenderer;
+import net.minecraft.world.item.Item;
+
+import java.util.function.Supplier;
+
 public interface IPlatformHelper {
 
     /**
@@ -33,4 +38,8 @@ public interface IPlatformHelper {
 
         return isDevelopmentEnvironment() ? "development" : "production";
     }
+
+    <T extends Item> void registerWatchRenderer(T item, Supplier<IWatchRenderer> rendererSupplier);
+
+    <T extends Item> IWatchRenderer getWatchRenderer(T item);
 }
