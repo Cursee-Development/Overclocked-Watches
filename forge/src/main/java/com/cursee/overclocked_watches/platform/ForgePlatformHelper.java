@@ -2,11 +2,13 @@ package com.cursee.overclocked_watches.platform;
 
 import com.cursee.overclocked_watches.client.item.renderer.IWatchRenderer;
 import com.cursee.overclocked_watches.core.registry.ModItemsForge;
+import com.cursee.overclocked_watches.core.registry.ModParticlesForge;
 import com.cursee.overclocked_watches.platform.services.IPlatformHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -87,6 +89,21 @@ public class ForgePlatformHelper implements IPlatformHelper {
         });
 
         return foundWatch.get();
+    }
+
+    @Override
+    public SimpleParticleType getGoldenWatchGrowthParticle() {
+        return ModParticlesForge.GOLDEN_WATCH_GROWTH.get();
+    }
+
+    @Override
+    public SimpleParticleType getDiamondWatchGrowthParticle() {
+        return ModParticlesForge.GOLDEN_WATCH_GROWTH.get();
+    }
+
+    @Override
+    public SimpleParticleType getNetheriteWatchGrowthParticle() {
+        return ModParticlesForge.GOLDEN_WATCH_GROWTH.get();
     }
 
     private record WatchCurioRenderer(IWatchRenderer renderer) implements ICurioRenderer {
