@@ -1,7 +1,7 @@
-package com.cursee.examplemod.mixin;
+package com.cursee.overclocked_watches.mixin;
 
-import com.cursee.examplemod.Constants;
-import com.cursee.examplemod.platform.Services;
+import com.cursee.overclocked_watches.Constants;
+import com.cursee.overclocked_watches.platform.Services;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

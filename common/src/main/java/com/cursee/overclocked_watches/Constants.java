@@ -1,4 +1,4 @@
-package com.cursee.examplemod;
+package com.cursee.overclocked_watches;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,8 +7,8 @@ import oshi.util.tuples.Triplet;
 
 public class Constants {
 
-	public static final String MOD_ID = "examplemod";
-	public static final String MOD_NAME = "ExampleMod";
+	public static final String MOD_ID = "overclocked_watches";
+	public static final String MOD_NAME = "Overclocked Watches";
 	public static final String MOD_VERSION = "1.0.0";
 	public static final String MC_VERSION_RAW = "[1.20.1]";
 	public static final Pair<String, String> PUBLISHER_AUTHOR = new Pair<String, String>("Lupin", "Jason13");

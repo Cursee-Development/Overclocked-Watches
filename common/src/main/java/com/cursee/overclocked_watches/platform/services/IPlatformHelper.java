@@ -1,4 +1,4 @@
-package com.cursee.examplemod.platform.services;
+package com.cursee.overclocked_watches.platform.services;
 
 public interface IPlatformHelper {
 

@@ -1,7 +1,7 @@
-package com.cursee.examplemod.platform;
+package com.cursee.overclocked_watches.platform;
 
-import com.cursee.examplemod.Constants;
-import com.cursee.examplemod.platform.services.IPlatformHelper;
+import com.cursee.overclocked_watches.Constants;
+import com.cursee.overclocked_watches.platform.services.IPlatformHelper;
 
 import java.util.ServiceLoader;
 

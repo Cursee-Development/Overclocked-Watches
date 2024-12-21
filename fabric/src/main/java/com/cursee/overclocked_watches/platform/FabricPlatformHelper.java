@@ -1,6 +1,6 @@
-package com.cursee.examplemod.platform;
+package com.cursee.overclocked_watches.platform;
 
-import com.cursee.examplemod.platform.services.IPlatformHelper;
+import com.cursee.overclocked_watches.platform.services.IPlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
 
 public class FabricPlatformHelper implements IPlatformHelper {
