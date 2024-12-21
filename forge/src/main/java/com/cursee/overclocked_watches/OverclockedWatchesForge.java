@@ -1,12 +1,17 @@
 package com.cursee.overclocked_watches;
 
 import com.cursee.monolib.core.sailing.Sailing;
+import com.cursee.overclocked_watches.client.KeyInputHandlerForge;
 import com.cursee.overclocked_watches.client.OverclockedWatchesClientForge;
 import com.cursee.overclocked_watches.core.curio.WearableWatchCurio;
 import com.cursee.overclocked_watches.core.item.custom.WatchItem;
 import com.cursee.overclocked_watches.core.registry.RegistryForge;
+import com.cursee.overclocked_watches.platform.Services;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -29,11 +34,21 @@ public class OverclockedWatchesForge {
         if (FMLEnvironment.dist == Dist.CLIENT) new OverclockedWatchesClientForge(modEventBus);
 
         MinecraftForge.EVENT_BUS.addGenericListener(ItemStack.class, this::onAttachCapabilities);
+        MinecraftForge.EVENT_BUS.addListener(this::onKeyInput);
     }
 
     private void onAttachCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
         if (event.getObject().getItem() instanceof WatchItem item) {
             event.addCapability(CuriosCapability.ID_ITEM, CurioItemCapability.createProvider(new WearableWatchCurio(item, event.getObject())));
+        }
+    }
+
+    private void onKeyInput(InputEvent.Key event) {
+        if(KeyInputHandlerForge.dayNightKey.consumeClick()) {
+            // todo: networking to change from day to night
+            if (Services.PLATFORM.playerHasNetheriteWatchEquipped(Minecraft.getInstance().player)) System.out.println("found netherite watch after key clicked");
+            else if (Services.PLATFORM.playerHasDiamondWatchEquipped(Minecraft.getInstance().player)) System.out.println("found diamond watch after key clicked");
+            else if (Services.PLATFORM.playerHasGoldenWatchEquipped(Minecraft.getInstance().player)) System.out.println("found golden watch after key clicked");
         }
     }
 }

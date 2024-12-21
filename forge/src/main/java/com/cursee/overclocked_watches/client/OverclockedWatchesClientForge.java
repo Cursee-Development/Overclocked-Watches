@@ -13,8 +13,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -30,6 +33,7 @@ public class OverclockedWatchesClientForge {
         modEventBus.addListener(this::onClientSetup);
         modEventBus.addListener(this::onAddEntityRendererLayers);
         modEventBus.addListener(this::onRegisterParticleProviders);
+        modEventBus.addListener(this::onRegisterKeyMappings);
 
         ArmRenderHandler.setup();
     }
@@ -82,5 +86,9 @@ public class OverclockedWatchesClientForge {
         event.registerSpriteSet(ModParticlesForge.GOLDEN_WATCH_GROWTH.get(), WatchGrowthParticle.HappyVillagerParticleCopiedProvider::new);
         event.registerSpriteSet(ModParticlesForge.DIAMOND_WATCH_GROWTH.get(), WatchGrowthParticle.HappyVillagerParticleCopiedProvider::new);
         event.registerSpriteSet(ModParticlesForge.NETHERITE_WATCH_GROWTH.get(), WatchGrowthParticle.HappyVillagerParticleCopiedProvider::new);
+    }
+
+    public void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
+        event.register(KeyInputHandlerForge.dayNightKey);
     }
 }

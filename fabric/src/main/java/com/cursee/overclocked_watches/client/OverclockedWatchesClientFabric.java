@@ -14,10 +14,15 @@ public class OverclockedWatchesClientFabric implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+
         OverclockedWatchesClientFabric.registerModelLayers();
+
         ParticleFactoryRegistry.getInstance().register(ModParticlesFabric.GOLDEN_WATCH_GROWTH, WatchGrowthParticle.HappyVillagerParticleCopiedProvider::new);
         ParticleFactoryRegistry.getInstance().register(ModParticlesFabric.DIAMOND_WATCH_GROWTH, WatchGrowthParticle.HappyVillagerParticleCopiedProvider::new);
         ParticleFactoryRegistry.getInstance().register(ModParticlesFabric.NETHERITE_WATCH_GROWTH, WatchGrowthParticle.HappyVillagerParticleCopiedProvider::new);
+
+        KeyInputHandlerFabric.register();
+
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new TrinketRenderers());
     }
 

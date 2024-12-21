@@ -3,5 +3,8 @@
 
   "item.overclocked_watches.golden_watch": "Golden Watch",
   "item.overclocked_watches.diamond_watch": "Diamond Watch",
-  "item.overclocked_watches.netherite_watch": "Netherite Watch"
+  "item.overclocked_watches.netherite_watch": "Netherite Watch",
+
+  "key.category.overclocked_watches.day_night":  "Overclocked Watches",
+  "key.overclocked_watches.day_night": "Toggle Day/Night"
 }
