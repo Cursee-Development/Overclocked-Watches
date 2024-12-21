@@ -1,8 +1,8 @@
 {
   "replace": false,
   "values": [
-    "overclocked_watches.json:golden_watch",
-    "overclocked_watches.json:diamond_watch",
-    "overclocked_watches.json:netherite_watch"
+    "overclocked_watches:golden_watch",
+    "overclocked_watches:diamond_watch",
+    "overclocked_watches:netherite_watch"
   ]
 }
