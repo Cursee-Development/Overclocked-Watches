@@ -1,21 +1,25 @@
 package com.cursee.overclocked_watches.platform;
 
 import com.cursee.overclocked_watches.client.item.renderer.IWatchRenderer;
+import com.cursee.overclocked_watches.core.registry.ModItemsForge;
 import com.cursee.overclocked_watches.platform.services.IPlatformHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 public class ForgePlatformHelper implements IPlatformHelper {
@@ -52,6 +56,38 @@ public class ForgePlatformHelper implements IPlatformHelper {
         CuriosRendererRegistry.register(item, () -> new WatchCurioRenderer(rendererSupplier.get()));
     }
 
+    @Override
+    public boolean playerHasGoldenWatchEquipped(Player player) {
+
+        final AtomicBoolean foundWatch = new AtomicBoolean(false);
+        CuriosApi.getCuriosInventory(player).ifPresent(iCuriosItemHandler -> {
+            if (iCuriosItemHandler.isEquipped(ModItemsForge.GOLDEN_WATCH.get())) foundWatch.set(true);
+        });
+
+        return foundWatch.get();
+    }
+
+    @Override
+    public boolean playerHasDiamondWatchEquipped(Player player) {
+
+        final AtomicBoolean foundWatch = new AtomicBoolean(false);
+        CuriosApi.getCuriosInventory(player).ifPresent(iCuriosItemHandler -> {
+            if (iCuriosItemHandler.isEquipped(ModItemsForge.DIAMOND_WATCH.get())) foundWatch.set(true);
+        });
+
+        return foundWatch.get();
+    }
+
+    @Override
+    public boolean playerHasNetheriteWatchEquipped(Player player) {
+
+        final AtomicBoolean foundWatch = new AtomicBoolean(false);
+        CuriosApi.getCuriosInventory(player).ifPresent(iCuriosItemHandler -> {
+            if (iCuriosItemHandler.isEquipped(ModItemsForge.NETHERITE_WATCH.get())) foundWatch.set(true);
+        });
+
+        return foundWatch.get();
+    }
 
     private record WatchCurioRenderer(IWatchRenderer renderer) implements ICurioRenderer {
 

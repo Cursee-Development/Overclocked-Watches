@@ -1,6 +1,7 @@
 package com.cursee.overclocked_watches.platform.services;
 
 import com.cursee.overclocked_watches.client.item.renderer.IWatchRenderer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 
 import java.util.function.Supplier;
@@ -42,4 +43,8 @@ public interface IPlatformHelper {
     <T extends Item> void registerWatchRenderer(T item, Supplier<IWatchRenderer> rendererSupplier);
 
     <T extends Item> IWatchRenderer getWatchRenderer(T item);
+
+    boolean playerHasGoldenWatchEquipped(Player player);
+    boolean playerHasDiamondWatchEquipped(Player player);
+    boolean playerHasNetheriteWatchEquipped(Player player);
 }

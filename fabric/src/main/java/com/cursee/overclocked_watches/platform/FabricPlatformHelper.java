@@ -1,19 +1,23 @@
 package com.cursee.overclocked_watches.platform;
 
 import com.cursee.overclocked_watches.client.item.renderer.IWatchRenderer;
+import com.cursee.overclocked_watches.core.registry.ModItemsFabric;
 import com.cursee.overclocked_watches.platform.services.IPlatformHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.emi.trinkets.api.SlotReference;
+import dev.emi.trinkets.api.TrinketsApi;
 import dev.emi.trinkets.api.client.TrinketRenderer;
 import dev.emi.trinkets.api.client.TrinketRendererRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 public class FabricPlatformHelper implements IPlatformHelper {
@@ -47,6 +51,39 @@ public class FabricPlatformHelper implements IPlatformHelper {
             return artifactTrinketRenderer.renderer();
         }
         return null;
+    }
+
+    @Override
+    public boolean playerHasGoldenWatchEquipped(Player player) {
+
+        final AtomicBoolean foundWatch = new AtomicBoolean(false);
+        TrinketsApi.getTrinketComponent(player).ifPresent(trinketComponent -> {
+            if (trinketComponent.isEquipped(itemStack -> itemStack.getItem() == ModItemsFabric.GOLDEN_WATCH)) foundWatch.set(true);
+        });
+
+        return foundWatch.get();
+    }
+
+    @Override
+    public boolean playerHasDiamondWatchEquipped(Player player) {
+
+        final AtomicBoolean foundWatch = new AtomicBoolean(false);
+        TrinketsApi.getTrinketComponent(player).ifPresent(trinketComponent -> {
+            if (trinketComponent.isEquipped(itemStack -> itemStack.getItem() == ModItemsFabric.DIAMOND_WATCH)) foundWatch.set(true);
+        });
+
+        return foundWatch.get();
+    }
+
+    @Override
+    public boolean playerHasNetheriteWatchEquipped(Player player) {
+
+        final AtomicBoolean foundWatch = new AtomicBoolean(false);
+        TrinketsApi.getTrinketComponent(player).ifPresent(trinketComponent -> {
+            if (trinketComponent.isEquipped(itemStack -> itemStack.getItem() == ModItemsFabric.NETHERITE_WATCH)) foundWatch.set(true);
+        });
+
+        return foundWatch.get();
     }
 
     private record WatchTrinketRenderer(IWatchRenderer renderer) implements TrinketRenderer {
