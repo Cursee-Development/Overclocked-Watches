@@ -1,5 +1,6 @@
 package com.cursee.overclocked_watches.mixin;
 
+import com.cursee.overclocked_watches.OverclockedWatches;
 import com.cursee.overclocked_watches.platform.Services;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -49,36 +50,15 @@ public class MobMixin {
         // execute the highest tier of watch first
         if (FOUND_NETHERITE_WATCH.get()) {
             mob.ageUp((60 * 4)); // four minutes
-            unique_$_addNetheriteGrowthParticles(level, mob.blockPosition(), 8);
+            OverclockedWatches.addNetheriteGrowthParticles(level, mob.blockPosition(), 8);
         }
         else if (FOUND_DIAMOND_WATCH.get()) {
             mob.ageUp((60 * 2)); // two minutes
-            unique_$_addDiamondGrowthParticles(level, mob.blockPosition(), 8);
+            OverclockedWatches.addDiamondGrowthParticles(level, mob.blockPosition(), 8);
         }
         else if (FOUND_GOLDEN_WATCH.get()) {
             mob.ageUp(60); // one minute
-            unique_$_addGoldenGrowthParticles(level, mob.blockPosition(), 8);
-        }
-    }
-
-    @Unique
-    private static void unique_$_addGoldenGrowthParticles(ServerLevel level, BlockPos blockPos, int particleCount) {
-        for(int i = 0; i < particleCount; ++i) {
-            level.sendParticles(Services.PLATFORM.getGoldenWatchGrowthParticle(), ((double) blockPos.getX()) + level.random.nextDouble(), ((double) blockPos.getY()) + 0.5D, ((double) blockPos.getZ()) + level.random.nextDouble(), 1, 0.0D, 0.0D, 0.0D, 0.2D);
-        }
-    }
-
-    @Unique
-    private static void unique_$_addDiamondGrowthParticles(ServerLevel level, BlockPos blockPos, int particleCount) {
-        for(int i = 0; i < particleCount; ++i) {
-            level.sendParticles(Services.PLATFORM.getDiamondWatchGrowthParticle(), ((double) blockPos.getX()) + level.random.nextDouble(), ((double) blockPos.getY()) + 0.5D, ((double) blockPos.getZ()) + level.random.nextDouble(), 1, 0.0D, 0.0D, 0.0D, 0.2D);
-        }
-    }
-
-    @Unique
-    private static void unique_$_addNetheriteGrowthParticles(ServerLevel level, BlockPos blockPos, int particleCount) {
-        for(int i = 0; i < particleCount; ++i) {
-            level.sendParticles(Services.PLATFORM.getNetheriteWatchGrowthParticle(), ((double) blockPos.getX()) + level.random.nextDouble(), ((double) blockPos.getY()) + 0.5D, ((double) blockPos.getZ()) + level.random.nextDouble(), 1, 0.0D, 0.0D, 0.0D, 0.2D);
+            OverclockedWatches.addGoldenGrowthParticles(level, mob.blockPosition(), 8);
         }
     }
 }
