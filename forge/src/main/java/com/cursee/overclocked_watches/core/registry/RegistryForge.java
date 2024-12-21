@@ -22,6 +22,10 @@ public class RegistryForge {
     public static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, Constants.MOD_ID);
 
     public static void register(IEventBus modEventBus) {
+
+        ModItemsForge.register();
+        ModTabsForge.register();
+
         ITEMS.register(modEventBus);
         TABS.register(modEventBus);
         PARTICLES.register(modEventBus);

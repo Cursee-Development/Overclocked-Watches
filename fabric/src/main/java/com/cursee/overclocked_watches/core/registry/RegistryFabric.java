@@ -12,7 +12,10 @@ import java.util.function.Supplier;
 
 public class RegistryFabric {
 
-    public static void register() {}
+    public static void register() {
+        ModItemsFabric.register();
+        ModTabsFabric.register();
+    }
 
     protected static <T extends Item> T registerItem(String itemID, Supplier<T> itemSupplier) {
         return Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(Constants.MOD_ID, itemID), itemSupplier.get());
