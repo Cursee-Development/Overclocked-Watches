@@ -40,15 +40,15 @@ public class ArmsModel extends HumanoidModel<LivingEntity> {
         renderToBuffer(matrixStack, buffer, packedLight, packedOverlay, red, green, blue, alpha);
     }
 
-    public static ArmsModel createGoldenWatchModel(boolean hasSlimArms) {
+    public static ArmsModel bakeGoldenWatchTextureOnModel(boolean hasSlimArms) {
         return new ArmsModel(RendererUtil.bakeLayer(RendererLayers.goldenWatch(hasSlimArms)));
     }
 
-    public static ArmsModel createDiamondWatchModel(boolean hasSlimArms) {
+    public static ArmsModel bakeDiamondWatchTextureOnModel(boolean hasSlimArms) {
         return new ArmsModel(RendererUtil.bakeLayer(RendererLayers.diamondWatch(hasSlimArms)));
     }
 
-    public static ArmsModel createNetheriteWatchModel(boolean hasSlimArms) {
+    public static ArmsModel bakeNetheriteWatchTextureOnModel(boolean hasSlimArms) {
         return new ArmsModel(RendererUtil.bakeLayer(RendererLayers.netheriteWatch(hasSlimArms)));
     }
 }
