@@ -95,12 +95,12 @@ public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override
     public SimpleParticleType getDiamondWatchGrowthParticle() {
-        return ModParticlesFabric.GOLDEN_WATCH_GROWTH;
+        return ModParticlesFabric.DIAMOND_WATCH_GROWTH;
     }
 
     @Override
     public SimpleParticleType getNetheriteWatchGrowthParticle() {
-        return ModParticlesFabric.GOLDEN_WATCH_GROWTH;
+        return ModParticlesFabric.NETHERITE_WATCH_GROWTH;
     }
 
     private record WatchTrinketRenderer(IWatchRenderer renderer) implements TrinketRenderer {

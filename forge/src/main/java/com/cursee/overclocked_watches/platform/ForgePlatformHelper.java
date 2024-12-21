@@ -98,12 +98,12 @@ public class ForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public SimpleParticleType getDiamondWatchGrowthParticle() {
-        return ModParticlesForge.GOLDEN_WATCH_GROWTH.get();
+        return ModParticlesForge.DIAMOND_WATCH_GROWTH.get();
     }
 
     @Override
     public SimpleParticleType getNetheriteWatchGrowthParticle() {
-        return ModParticlesForge.GOLDEN_WATCH_GROWTH.get();
+        return ModParticlesForge.NETHERITE_WATCH_GROWTH.get();
     }
 
     private record WatchCurioRenderer(IWatchRenderer renderer) implements ICurioRenderer {
