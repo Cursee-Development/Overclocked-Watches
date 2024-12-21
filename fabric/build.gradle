@@ -3,9 +3,18 @@ plugins {
     id 'idea'
     id 'fabric-loom'
 }
+
 base {
     archivesName = "${mod_id}-fabric-${minecraft_version}"
 }
+
+repositories {
+    maven {
+        name = "OnyxStudios/Ladysnake"
+        url = 'https://maven.ladysnake.org/releases'
+    }
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     // mappings loom.officialMojangMappings()
@@ -19,6 +28,13 @@ dependencies {
     implementation project(":common")
 
     modImplementation "curse.maven:monolib-968432:5838445"
+
+    // Cardinal Components (Required for Trinkets)
+    modApi include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.0")
+    modApi include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.0")
+
+    // Trinkets (Curios (Fabric) was discontinued for 1.17+)
+    modImplementation "curse.maven:trinkets-341284:5173501"
 }
 
 loom {

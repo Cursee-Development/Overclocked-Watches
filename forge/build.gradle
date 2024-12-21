@@ -4,9 +4,20 @@ plugins {
     id 'org.parchmentmc.librarian.forgegradle'
     id 'org.spongepowered.mixin'
 }
+
 base {
     archivesName = "${mod_id}-forge-${minecraft_version}"
 }
+
+repositories {
+    maven {
+        url "https://maven.theillusivec4.top/"
+        content {
+            includeGroupByRegex "top.theillusivec4.*"
+        }
+    }
+}
+
 mixin {
     add(sourceSets.main, "${mod_id}.refmap.json")
 
@@ -81,6 +92,9 @@ dependencies {
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
 
     implementation fg.deobf("curse.maven:monolib-968432:5838457")
+
+    // Curios
+    implementation fg.deobf("top.theillusivec4.curios:curios-forge:5.8.1+1.20.1")
 }
 
 tasks.withType(JavaCompile).configureEach {
