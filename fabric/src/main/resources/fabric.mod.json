@@ -17,6 +17,9 @@
     "entrypoints": {
         "main": [
             "com.cursee.overclocked_watches.OverclockedWatchesFabric"
+        ],
+        "client": [
+            "com.cursee.overclocked_watches.client.OverclockedWatchesClientFabric"
         ]
     },
     "mixins": [
