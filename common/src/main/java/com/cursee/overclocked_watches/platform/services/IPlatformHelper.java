@@ -52,4 +52,6 @@ public interface IPlatformHelper {
     SimpleParticleType getGoldenWatchGrowthParticle();
     SimpleParticleType getDiamondWatchGrowthParticle();
     SimpleParticleType getNetheriteWatchGrowthParticle();
+
+    boolean consumeWatchCharge(Player player);
 }

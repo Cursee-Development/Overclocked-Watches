@@ -1,5 +1,6 @@
 package com.cursee.overclocked_watches.platform;
 
+import com.cursee.overclocked_watches.OverclockedWatches;
 import com.cursee.overclocked_watches.client.item.renderer.IWatchRenderer;
 import com.cursee.overclocked_watches.core.registry.ModItemsForge;
 import com.cursee.overclocked_watches.core.registry.ModParticlesForge;
@@ -9,6 +10,7 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -17,9 +19,11 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.SlotResult;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
@@ -104,6 +108,39 @@ public class ForgePlatformHelper implements IPlatformHelper {
     @Override
     public SimpleParticleType getNetheriteWatchGrowthParticle() {
         return ModParticlesForge.NETHERITE_WATCH_GROWTH.get();
+    }
+
+    @Override
+    public boolean consumeWatchCharge(Player player) {
+//        CuriosApi.getCuriosInventory(player).ifPresent(iCuriosItemHandler -> {
+//            if (iCuriosItemHandler.isEquipped(ModItemsForge.NETHERITE_WATCH.get())) {
+//                Optional<SlotResult> equippedWatch = iCuriosItemHandler.findFirstCurio(ModItemsForge.NETHERITE_WATCH.get());
+//                equippedWatch.ifPresent(slotResult -> {
+//                    slotResult.stack().getOrCreateTagElement("watch_charge.5");
+//                });
+//            }
+//        });
+
+        final AtomicBoolean CHARGE_CONSUMED = new AtomicBoolean(false);
+        CuriosApi.getCuriosInventory(player).ifPresent(iCuriosItemHandler -> {
+            if (iCuriosItemHandler.isEquipped(ModItemsForge.NETHERITE_WATCH.get())) {
+                iCuriosItemHandler.findFirstCurio(ModItemsForge.NETHERITE_WATCH.get()).ifPresent(slotResult -> {
+                    if (OverclockedWatches.handleNetheriteWatchTag(slotResult.stack())) CHARGE_CONSUMED.set(true);
+                });
+            }
+            else if (iCuriosItemHandler.isEquipped(ModItemsForge.DIAMOND_WATCH.get())) {
+                iCuriosItemHandler.findFirstCurio(ModItemsForge.DIAMOND_WATCH.get()).ifPresent(slotResult -> {
+                    if (OverclockedWatches.handleDiamondWatchTag(slotResult.stack())) CHARGE_CONSUMED.set(true);
+                });
+            }
+            else if (iCuriosItemHandler.isEquipped(ModItemsForge.GOLDEN_WATCH.get())) {
+                iCuriosItemHandler.findFirstCurio(ModItemsForge.GOLDEN_WATCH.get()).ifPresent(slotResult -> {
+                    if (OverclockedWatches.handleGoldenWatchTag(slotResult.stack())) CHARGE_CONSUMED.set(true);
+                });
+            }
+        });
+
+        return CHARGE_CONSUMED.get();
     }
 
     private record WatchCurioRenderer(IWatchRenderer renderer) implements ICurioRenderer {

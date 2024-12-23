@@ -1,11 +1,13 @@
 package com.cursee.overclocked_watches.platform;
 
+import com.cursee.overclocked_watches.OverclockedWatches;
 import com.cursee.overclocked_watches.client.item.renderer.IWatchRenderer;
 import com.cursee.overclocked_watches.core.registry.ModItemsFabric;
 import com.cursee.overclocked_watches.core.registry.ModParticlesFabric;
 import com.cursee.overclocked_watches.platform.services.IPlatformHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.emi.trinkets.api.SlotReference;
+import dev.emi.trinkets.api.TrinketComponent;
 import dev.emi.trinkets.api.TrinketsApi;
 import dev.emi.trinkets.api.client.TrinketRenderer;
 import dev.emi.trinkets.api.client.TrinketRendererRegistry;
@@ -13,11 +15,13 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
@@ -101,6 +105,39 @@ public class FabricPlatformHelper implements IPlatformHelper {
     @Override
     public SimpleParticleType getNetheriteWatchGrowthParticle() {
         return ModParticlesFabric.NETHERITE_WATCH_GROWTH;
+    }
+
+    @Override
+    public boolean consumeWatchCharge(Player player) {
+//        TrinketsApi.getTrinketComponent(player).ifPresent(trinketComponent -> {
+//            if (trinketComponent.isEquipped(itemStack -> itemStack.getItem() == ModItemsFabric.NETHERITE_WATCH)) {
+//                List<Tuple<SlotReference, ItemStack>> equippedNetheriteWatches = trinketComponent.getEquipped(ModItemsFabric.NETHERITE_WATCH);
+//                equippedNetheriteWatches.forEach(slotReferenceItemStackTuple -> {
+//                    slotReferenceItemStackTuple.getB().getOrCreateTagElement("watch_charge.5");
+//                });
+//            }
+//        });
+
+        final AtomicBoolean CHARGE_CONSUMED = new AtomicBoolean(false);
+        TrinketsApi.getTrinketComponent(player).ifPresent(component -> {
+            if (component.isEquipped(ModItemsFabric.NETHERITE_WATCH)) {
+                component.getEquipped(ModItemsFabric.NETHERITE_WATCH).forEach(slotStackPair -> {
+                    if (OverclockedWatches.handleNetheriteWatchTag(slotStackPair.getB())) CHARGE_CONSUMED.set(true);
+                });
+            }
+            else if (component.isEquipped(ModItemsFabric.DIAMOND_WATCH)) {
+                component.getEquipped(ModItemsFabric.DIAMOND_WATCH).forEach(slotStackPair -> {
+                    if (OverclockedWatches.handleDiamondWatchTag(slotStackPair.getB())) CHARGE_CONSUMED.set(true);
+                });
+            }
+            else if (component.isEquipped(ModItemsFabric.GOLDEN_WATCH)) {
+                component.getEquipped(ModItemsFabric.GOLDEN_WATCH).forEach(slotStackPair -> {
+                    if (OverclockedWatches.handleGoldenWatchTag(slotStackPair.getB())) CHARGE_CONSUMED.set(true);
+                });
+            }
+        });
+
+        return CHARGE_CONSUMED.get();
     }
 
     private record WatchTrinketRenderer(IWatchRenderer renderer) implements TrinketRenderer {
