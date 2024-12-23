@@ -31,7 +31,8 @@
         "fabric": "*",
         "minecraft": "*",
         "java": ">=17",
-        "monolib": ">=1.4.1"
+        "monolib": ">=1.4.1",
+        "trinkets": "*"
     },
     "suggests": {
         "another-mod": "*"

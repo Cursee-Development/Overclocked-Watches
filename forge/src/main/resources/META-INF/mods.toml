@@ -34,3 +34,10 @@ mandatory = true
 versionRange = "[1.4.1,)"
 ordering = "AFTER"
 side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "curios"
+mandatory = true
+versionRange = "[5.10.0+1.20.1,)"
+ordering = "AFTER"
+side = "BOTH"
