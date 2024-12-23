@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Mixin(Player.class)
-public class PlayerMixin {
+public class ForgePlayerMixin {
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void injected_$_onTick(CallbackInfo ci) {
@@ -50,20 +50,17 @@ public class PlayerMixin {
             if (crop.isMaxAge(blockState)) return;
 
             if (FOUND_NETHERITE_WATCH.get()) {
-                for (int i=0; i<3; i++) {
+                for (int i=0; i<4; i++) {
                     unique_$_forceGrowth(crop, blockState, level, blockPos);
                 }
                 OverclockedWatches.addNetheriteGrowthParticles(level, blockPos, 8);
             }
             else if (FOUND_DIAMOND_WATCH.get()) {
-
-                for (int i=0; i<2; i++) {
-                    unique_$_forceGrowth(crop, blockState, level, blockPos);
-                }
+                unique_$_forceGrowth(crop, blockState, level, blockPos);
                 OverclockedWatches.addDiamondGrowthParticles(level, blockPos, 8);
             }
             else if (FOUND_GOLDEN_WATCH.get()) {
-                unique_$_forceGrowth(crop, blockState, level, blockPos);
+                if (level.random.nextInt(10) == 1) unique_$_forceGrowth(crop, blockState, level, blockPos);
                 OverclockedWatches.addGoldenGrowthParticles(level, blockPos, 8);
             }
         });

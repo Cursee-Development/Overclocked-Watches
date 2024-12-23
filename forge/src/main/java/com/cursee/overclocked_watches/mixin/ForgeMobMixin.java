@@ -1,8 +1,8 @@
 package com.cursee.overclocked_watches.mixin;
 
+import com.cursee.overclocked_watches.Constants;
 import com.cursee.overclocked_watches.OverclockedWatches;
 import com.cursee.overclocked_watches.platform.Services;
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Mob;
@@ -10,7 +10,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -18,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Mixin(Mob.class)
-public class MobMixin {
+public class ForgeMobMixin {
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void injected_$_onTick(CallbackInfo callbackInfo) {
@@ -49,15 +48,15 @@ public class MobMixin {
 
         // execute the highest tier of watch first
         if (FOUND_NETHERITE_WATCH.get()) {
-            mob.ageUp((60 * 4)); // four minutes
+            mob.ageUp(Constants.AGE_PROGRESSION_NETHERITE);
             OverclockedWatches.addNetheriteGrowthParticles(level, mob.blockPosition(), 8);
         }
         else if (FOUND_DIAMOND_WATCH.get()) {
-            mob.ageUp((60 * 2)); // two minutes
+            mob.ageUp(Constants.AGE_PROGRESSION_DIAMOND);
             OverclockedWatches.addDiamondGrowthParticles(level, mob.blockPosition(), 8);
         }
         else if (FOUND_GOLDEN_WATCH.get()) {
-            mob.ageUp(60); // one minute
+            mob.ageUp(Constants.AGE_PROGRESSION_GOLD);
             OverclockedWatches.addGoldenGrowthParticles(level, mob.blockPosition(), 8);
         }
     }

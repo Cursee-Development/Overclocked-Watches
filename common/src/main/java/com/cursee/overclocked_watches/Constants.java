@@ -17,4 +17,13 @@ public class Constants {
 
 	public static final String KEY_CATEGORY_DAY_NIGHT = "key.category.overclocked_watches.day_night";
 	public static final String KEY_DAY_NIGHT = "key.overclocked_watches.day_night";
+
+	// four minutes
+	public static final int AGE_PROGRESSION_NETHERITE = 60 * 4;
+
+	// thirty seconds
+	public static final int AGE_PROGRESSION_DIAMOND = 30;
+
+	// 5 seconds
+	public static final int AGE_PROGRESSION_GOLD = 5;
 }
