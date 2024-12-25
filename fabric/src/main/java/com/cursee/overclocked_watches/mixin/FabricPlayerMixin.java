@@ -56,7 +56,7 @@ public class FabricPlayerMixin {
                 OverclockedWatches.addNetheriteGrowthParticles(level, blockPos, 8);
             }
             else if (FOUND_DIAMOND_WATCH.get()) {
-                unique_$_forceGrowth(crop, blockState, level, blockPos);
+                if (level.random.nextBoolean()) unique_$_forceGrowth(crop, blockState, level, blockPos);
                 OverclockedWatches.addDiamondGrowthParticles(level, blockPos, 8);
             }
             else if (FOUND_GOLDEN_WATCH.get()) {
