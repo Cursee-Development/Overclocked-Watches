@@ -7,7 +7,7 @@ public class ModItemsFabric {
 
     public static void register() {}
 
-    public static final Item GOLDEN_WATCH = RegistryFabric.registerItem("golden_watch", () -> new WatchItem(new Item.Properties().stacksTo(1).defaultDurability(500)));
-    public static final Item DIAMOND_WATCH = RegistryFabric.registerItem("diamond_watch", () -> new WatchItem(new Item.Properties().stacksTo(1).defaultDurability(2500)));
-    public static final Item NETHERITE_WATCH = RegistryFabric.registerItem("netherite_watch", () -> new WatchItem(new Item.Properties().stacksTo(1).defaultDurability(5000)));
+    public static final Item GOLDEN_WATCH = RegistryFabric.registerItem("golden_watch", () -> new WatchItem(new Item.Properties().stacksTo(1).defaultDurability(50)));
+    public static final Item DIAMOND_WATCH = RegistryFabric.registerItem("diamond_watch", () -> new WatchItem(new Item.Properties().stacksTo(1).defaultDurability(250)));
+    public static final Item NETHERITE_WATCH = RegistryFabric.registerItem("netherite_watch", () -> new WatchItem(new Item.Properties().stacksTo(1).defaultDurability(500)));
 }
