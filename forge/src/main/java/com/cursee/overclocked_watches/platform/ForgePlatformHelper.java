@@ -26,6 +26,7 @@ import top.theillusivec4.curios.api.client.ICurioRenderer;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public class ForgePlatformHelper implements IPlatformHelper {
@@ -93,6 +94,33 @@ public class ForgePlatformHelper implements IPlatformHelper {
         });
 
         return foundWatch.get();
+    }
+
+    @Override
+    public ItemStack getEquippedGoldenWatch(Player player) {
+
+        AtomicReference<ItemStack> itemStackReference = new AtomicReference<ItemStack>(ItemStack.EMPTY);
+        CuriosApi.getCuriosInventory(player).ifPresent(iCuriosItemHandler -> iCuriosItemHandler.findFirstCurio(ModItemsForge.GOLDEN_WATCH.get()).ifPresent(slotResult -> itemStackReference.set(slotResult.stack())));
+
+        return itemStackReference.get();
+    }
+
+    @Override
+    public ItemStack getEquippedDiamondWatch(Player player) {
+
+        AtomicReference<ItemStack> itemStackReference = new AtomicReference<ItemStack>(ItemStack.EMPTY);
+        CuriosApi.getCuriosInventory(player).ifPresent(iCuriosItemHandler -> iCuriosItemHandler.findFirstCurio(ModItemsForge.DIAMOND_WATCH.get()).ifPresent(slotResult -> itemStackReference.set(slotResult.stack())));
+
+        return itemStackReference.get();
+    }
+
+    @Override
+    public ItemStack getEquippedNetheriteWatch(Player player) {
+
+        AtomicReference<ItemStack> itemStackReference = new AtomicReference<ItemStack>(ItemStack.EMPTY);
+        CuriosApi.getCuriosInventory(player).ifPresent(iCuriosItemHandler -> iCuriosItemHandler.findFirstCurio(ModItemsForge.NETHERITE_WATCH.get()).ifPresent(slotResult -> itemStackReference.set(slotResult.stack())));
+
+        return itemStackReference.get();
     }
 
     @Override

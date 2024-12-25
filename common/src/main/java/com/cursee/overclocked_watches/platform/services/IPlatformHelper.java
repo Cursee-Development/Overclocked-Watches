@@ -4,6 +4,7 @@ import com.cursee.overclocked_watches.client.item.renderer.IWatchRenderer;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Supplier;
 
@@ -48,6 +49,10 @@ public interface IPlatformHelper {
     boolean playerHasGoldenWatchEquipped(Player player);
     boolean playerHasDiamondWatchEquipped(Player player);
     boolean playerHasNetheriteWatchEquipped(Player player);
+
+    ItemStack getEquippedGoldenWatch(Player player);
+    ItemStack getEquippedDiamondWatch(Player player);
+    ItemStack getEquippedNetheriteWatch(Player player);
 
     SimpleParticleType getGoldenWatchGrowthParticle();
     SimpleParticleType getDiamondWatchGrowthParticle();

@@ -24,6 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public class FabricPlatformHelper implements IPlatformHelper {
@@ -90,6 +91,36 @@ public class FabricPlatformHelper implements IPlatformHelper {
         });
 
         return foundWatch.get();
+    }
+
+    @Override
+    public ItemStack getEquippedGoldenWatch(Player player) {
+
+        AtomicReference<ItemStack> itemStackReference = new AtomicReference<ItemStack>(ItemStack.EMPTY);
+//        TrinketsApi.getTrinketComponent(player).ifPresent(trinketComponent -> {
+//            if (trinketComponent.isEquipped(itemStack -> itemStack.getItem() == ModItemsFabric.GOLDEN_WATCH)) itemStackReference.set(trinketComponent.getEquipped(ModItemsFabric.NETHERITE_WATCH).get(0).getB());
+//        });
+        TrinketsApi.getTrinketComponent(player).ifPresent(trinketComponent -> trinketComponent.getEquipped(ModItemsFabric.GOLDEN_WATCH).forEach(slotReferenceItemStackTuple -> itemStackReference.set(slotReferenceItemStackTuple.getB())));
+
+        return itemStackReference.get();
+    }
+
+    @Override
+    public ItemStack getEquippedDiamondWatch(Player player) {
+
+        AtomicReference<ItemStack> itemStackReference = new AtomicReference<ItemStack>(ItemStack.EMPTY);
+        TrinketsApi.getTrinketComponent(player).ifPresent(trinketComponent -> trinketComponent.getEquipped(ModItemsFabric.DIAMOND_WATCH).forEach(slotReferenceItemStackTuple -> itemStackReference.set(slotReferenceItemStackTuple.getB())));
+
+        return itemStackReference.get();
+    }
+
+    @Override
+    public ItemStack getEquippedNetheriteWatch(Player player) {
+
+        AtomicReference<ItemStack> itemStackReference = new AtomicReference<ItemStack>(ItemStack.EMPTY);
+        TrinketsApi.getTrinketComponent(player).ifPresent(trinketComponent -> trinketComponent.getEquipped(ModItemsFabric.NETHERITE_WATCH).forEach(slotReferenceItemStackTuple -> itemStackReference.set(slotReferenceItemStackTuple.getB())));
+
+        return itemStackReference.get();
     }
 
     @Override
