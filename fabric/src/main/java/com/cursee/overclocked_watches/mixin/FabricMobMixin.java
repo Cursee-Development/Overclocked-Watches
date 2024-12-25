@@ -4,9 +4,11 @@ import com.cursee.overclocked_watches.Constants;
 import com.cursee.overclocked_watches.OverclockedWatches;
 import com.cursee.overclocked_watches.platform.Services;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import org.spongepowered.asm.mixin.Mixin;
@@ -42,6 +44,12 @@ public class FabricMobMixin {
             if (Services.PLATFORM.playerHasGoldenWatchEquipped(player)) FOUND_GOLDEN_WATCH.set(true);
             if (Services.PLATFORM.playerHasDiamondWatchEquipped(player)) FOUND_DIAMOND_WATCH.set(true);
             if (Services.PLATFORM.playerHasNetheriteWatchEquipped(player)) FOUND_NETHERITE_WATCH.set(true);
+
+            if (player.getRandom().nextInt(0, 1000) == 1) {
+                ItemStack equippedWatch = Services.PLATFORM.getEquippedNetheriteWatch(player);
+                equippedWatch.hurt(1, player.getRandom(), (ServerPlayer) player);
+                if (equippedWatch.getDamageValue() >= equippedWatch.getMaxDamage()) equippedWatch.shrink(1);
+            }
         });
 
         if (!(FOUND_GOLDEN_WATCH.get() || FOUND_DIAMOND_WATCH.get() || FOUND_NETHERITE_WATCH.get())) return;

@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -64,6 +65,12 @@ public class ForgePlayerMixin {
                 OverclockedWatches.addGoldenGrowthParticles(level, blockPos, 8);
             }
         });
+
+        if (player.getRandom().nextInt(0, 1000) == 1) {
+            ItemStack equippedWatch = Services.PLATFORM.getEquippedNetheriteWatch(player);
+            equippedWatch.hurt(1, player.getRandom(), (ServerPlayer) player);
+            if (equippedWatch.getDamageValue() >= equippedWatch.getMaxDamage()) equippedWatch.shrink(1);
+        }
     }
 
     @Unique
