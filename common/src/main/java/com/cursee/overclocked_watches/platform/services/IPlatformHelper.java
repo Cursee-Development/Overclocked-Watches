@@ -46,6 +46,10 @@ public interface IPlatformHelper {
 
     <T extends Item> IWatchRenderer getWatchRenderer(T item);
 
+    Supplier<Item> getRegisteredGoldenWatchItem();
+    Supplier<Item> getRegisteredDiamondWatchItem();
+    Supplier<Item> getRegisteredNetheriteWatchItem();
+
     boolean playerHasGoldenWatchEquipped(Player player);
     boolean playerHasDiamondWatchEquipped(Player player);
     boolean playerHasNetheriteWatchEquipped(Player player);

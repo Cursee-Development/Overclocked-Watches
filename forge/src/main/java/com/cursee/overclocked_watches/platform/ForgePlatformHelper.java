@@ -64,6 +64,21 @@ public class ForgePlatformHelper implements IPlatformHelper {
     }
 
     @Override
+    public Supplier<Item> getRegisteredGoldenWatchItem() {
+        return () -> ModItemsForge.GOLDEN_WATCH.get();
+    }
+
+    @Override
+    public Supplier<Item> getRegisteredDiamondWatchItem() {
+        return () -> ModItemsForge.DIAMOND_WATCH.get();
+    }
+
+    @Override
+    public Supplier<Item> getRegisteredNetheriteWatchItem() {
+        return () -> ModItemsForge.NETHERITE_WATCH.get();
+    }
+
+    @Override
     public boolean playerHasGoldenWatchEquipped(Player player) {
 
         final AtomicBoolean foundWatch = new AtomicBoolean(false);

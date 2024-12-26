@@ -61,6 +61,21 @@ public class FabricPlatformHelper implements IPlatformHelper {
     }
 
     @Override
+    public Supplier<Item> getRegisteredGoldenWatchItem() {
+        return () -> ModItemsFabric.GOLDEN_WATCH;
+    }
+
+    @Override
+    public Supplier<Item> getRegisteredDiamondWatchItem() {
+        return () -> ModItemsFabric.DIAMOND_WATCH;
+    }
+
+    @Override
+    public Supplier<Item> getRegisteredNetheriteWatchItem() {
+        return () -> ModItemsFabric.NETHERITE_WATCH;
+    }
+
+    @Override
     public boolean playerHasGoldenWatchEquipped(Player player) {
 
         final AtomicBoolean foundWatch = new AtomicBoolean(false);
