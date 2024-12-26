@@ -1,5 +1,6 @@
 package com.cursee.overclocked_watches.core.network.packet;
 
+import com.cursee.overclocked_watches.ConfigForge;
 import com.cursee.overclocked_watches.core.registry.ModItemsForge;
 import com.cursee.overclocked_watches.platform.Services;
 import net.minecraft.network.FriendlyByteBuf;
@@ -26,6 +27,9 @@ public class ForgeDayNightC2SPacket {
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
+
+            if (!ConfigForge.DAY_NIGHT_CHANGE_ALLOWED.get()) return;
+
             ServerPlayer player = context.getSender();
 
             // player has watch variant equipped

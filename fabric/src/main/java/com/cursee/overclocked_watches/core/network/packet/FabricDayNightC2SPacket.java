@@ -1,5 +1,6 @@
 package com.cursee.overclocked_watches.core.network.packet;
 
+import com.cursee.overclocked_watches.ConfigFabric;
 import com.cursee.overclocked_watches.core.registry.ModItemsFabric;
 import com.cursee.overclocked_watches.platform.Services;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -16,6 +17,8 @@ import net.minecraft.world.level.Level;
 public class FabricDayNightC2SPacket {
 
     public static void handle(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender) {
+
+        if (!ConfigFabric.DAY_NIGHT_CHANGE_ALLOWED.get()) return;
 
         // player has watch variant equipped
         final boolean hasNetheriteWatch = Services.PLATFORM.playerHasNetheriteWatchEquipped(player);

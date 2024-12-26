@@ -16,6 +16,7 @@
     ],
     "injectors": {
       "defaultRequire": 1
-    }
+    },
+    "plugin": "com.cursee.overclocked_watches.ConfigFabric"
   }
   
