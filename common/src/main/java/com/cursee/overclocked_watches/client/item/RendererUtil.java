@@ -88,8 +88,8 @@ public abstract class RendererUtil {
         // Add the watch face
         leftArm.texOffs(0, 18);
         leftArm.addBox(
-                calc(armWidth) - 1, -5, -2,
-                1, 4, 4);
+                calc(armWidth) + 6, -5, -2,
+                -1, 4, 4);
         rightArm.texOffs(16, 18);
         rightArm.addBox(
                 calc(armWidth) - 1, -5, -2,
