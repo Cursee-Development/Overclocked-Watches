@@ -1,16 +1,13 @@
 plugins {
-    id 'idea'
-    id 'net.minecraftforge.gradle'
-    id 'org.parchmentmc.librarian.forgegradle'
-    id 'org.spongepowered.mixin'
+    id 'multiloader-loader'
+    id 'net.neoforged.moddev.legacyforge'
 }
 
-base {
-    archivesName = "${mod_id}-forge-${minecraft_version}"
-}
+dependencies {
+  compileOnly project(":common")
+  annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
 
-repositories {
-    maven { url 'https://maven.theillusivec4.top/' }
+  modImplementation "curse.maven:monolib-968432:7974599"
 }
 
 mixin {
@@ -20,84 +17,42 @@ mixin {
     config("${mod_id}.forge.mixins.json")
 }
 
-minecraft {
-    // mappings channel: 'official', version: minecraft_version
-    mappings channel: "parchment", version: "${parchment_version}-${minecraft_version}"
+legacyForge {
+    version = "${minecraft_version}-${forge_version}"
 
-    copyIdeResources = true //Calls processResources when in dev
+    validateAccessTransformers = true
 
-    // Automatically enable forge AccessTransformers if the file exists
-    // This location is hardcoded in Forge and can not be changed.
-    // https://github.com/MinecraftForge/MinecraftForge/blob/be1698bb1554f9c8fa2f58e32b9ab70bc4385e60/fmlloader/src/main/java/net/minecraftforge/fml/loading/moddiscovery/ModFile.java#L123
-    if (file('src/main/resources/META-INF/accesstransformer.cfg').exists()) {
-        accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
+    if (at.exists()) {
+        accessTransformers = ["src/main/resources/META-INF/accesstransformer.cfg"]
     }
-
+    parchment {
+        minecraftVersion = parchment_minecraft
+        mappingsVersion = parchment_version
+    }
     runs {
         client {
-            workingDirectory project.file('run')
-            ideaModule "${rootProject.name}.${project.name}.main"
-            taskName 'Client'
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-            mods {
-                modClientRun {
-                    source sourceSets.main
-                    source project(":common").sourceSets.main
-                }
-            }
+            client()
         }
-
-        server {
-            workingDirectory project.file('run')
-            ideaModule "${rootProject.name}.${project.name}.main"
-            taskName 'Server'
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-            mods {
-                modServerRun {
-                    source sourceSets.main
-                    source project(":common").sourceSets.main
-                }
-            }
-        }
-
         data {
-            workingDirectory project.file('run')
-            ideaModule "${rootProject.name}.${project.name}.main"
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-            taskName 'Data'
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-            mods {
-                modDataRun {
-                    source sourceSets.main
-                    source project(":common").sourceSets.main
-                }
-            }
+            data()
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+        server {
+            server()
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
         }
     }
 }
 
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
-dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    compileOnly project(":common")
-    annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
-
-    // implementation fg.deobf("curse.maven:monolib-968432:6123976")
-
-    // Curios
-    implementation fg.deobf("top.theillusivec4.curios:curios-forge:5.8.1+1.20.1")
+jar {
+    finalizedBy('reobfJar')
+    manifest.attributes(["MixinConfigs": "${mod_id}.mixins.json,${mod_id}.forge.mixins.json"])
 }
-
-tasks.withType(JavaCompile).configureEach {
-    source(project(":common").sourceSets.main.allSource)
-}
-
-processResources {
-    from project(":common").sourceSets.main.resources
-}
-
-jar.finalizedBy('reobfJar')

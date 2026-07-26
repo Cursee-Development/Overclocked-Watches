@@ -1,23 +1,12 @@
 plugins {
-    id 'java'
-    id 'idea'
+    id 'multiloader-loader'
     id 'fabric-loom'
 }
-
-base {
-    archivesName = "${mod_id}-fabric-${minecraft_version}"
-}
-
-repositories {
-    maven { url 'https://maven.ladysnake.org/releases' }
-}
-
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    // mappings loom.officialMojangMappings()
-    mappings loom.layered() {
+    mappings loom.layered {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip")
+        parchment("org.parchmentmc.data:parchment-${parchment_minecraft}:${parchment_version}@zip")
     }
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
@@ -27,16 +16,6 @@ dependencies {
     implementation 'com.electronwill.night-config:toml:3.6.0'
     include 'com.electronwill.night-config:core:3.6.0'
     include 'com.electronwill.night-config:toml:3.6.0'
-
-    // ModMenu
-    modImplementation "curse.maven:modmenu-308702:5162837"
-
-    // modImplementation "curse.maven:monolib-968432:6123964"
-
-    // Trinkets
-    modApi include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.0")
-    modApi include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.0")
-    modImplementation "curse.maven:trinkets-341284:5173501"
 }
 
 loom {
@@ -60,12 +39,4 @@ loom {
             runDir("run")
         }
     }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    source(project(":common").sourceSets.main.allSource)
-}
-
-processResources {
-    from project(":common").sourceSets.main.resources
 }

@@ -1,106 +1,167 @@
-plugins {
-    id 'fabric-loom' version '1.7-SNAPSHOT' apply(false)
-    id 'net.minecraftforge.gradle' version '6.0.25' apply(false)
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+' apply(false)
-    id 'org.spongepowered.gradle.vanilla' version '0.2.1-SNAPSHOT' apply(false)
-    id("org.spongepowered.mixin") version "0.7-SNAPSHOT" apply(false)
-
-    // PacifistMC's Forgix, used to create the final merged jar
-    // id "io.github.pacifistmc.forgix" version "1.2.9"
+buildscript {
+  dependencies {
+    // Same relocation library Forgix uses internally (ASM-based jar relocation).
+    // Resolved via settings.gradle's pluginManagement repositories (includes mavenCentral()).
+    classpath 'me.lucko:jar-relocator:1.7'
+  }
 }
 
-//forgix {
-//    group = "${project.group}" // same as targetting ${group}, just not sure if expandProps occurs before this
-//    mergedJarName = "${mod_id}-merged-${minecraft_version}-${project.version}.jar"
-//    outputDir = "build/libs"
+import me.lucko.jarrelocator.JarRelocator
+import me.lucko.jarrelocator.Relocation
+
+plugins {
+    id 'fabric-loom' version '1.9-SNAPSHOT' apply(false)
+    id 'net.neoforged.moddev.legacyforge' version '2.0.77' apply(false)
+}
+
+// Force :fabric and :forge to configure so remapJar/jar
+// are registered before we reference them
+evaluationDependsOn(':fabric')
+evaluationDependsOn(':forge')
+
+// Returns true if the first few KB of the file look like text (no null bytes).
+// Same cheap heuristic Forgix uses to avoid touching binary resources.
+def isProbablyTextFile(File file) {
+  def size = Math.min(file.length(), 4096L) as int
+  if (size == 0) return true
+  def data = new byte[size]
+  file.withInputStream { it.read(data, 0, size) }
+  return !data.any { it == (byte) 0 }
+}
+
+// Relocates a platform jar's mod package under a loader-specific prefix
+// (e.g. "io.github.x" -> "fabric.io.github.x"), the same trick Forgix uses to let
+// fabric's and forge's independently-compiled copies of common code (and its
+// mixins/services configs) coexist in one jar without colliding.
 //
-//    custom {
-//        projectName = "common"
-//        jarLocation = "build/libs/${mod_id}-common-${minecraft_version}-${project.version}.jar"
-//    }
-//
-//    fabric {
-//        projectName = "fabric"
-//        jarLocation = "build/libs/${mod_id}-fabric-${minecraft_version}-${project.version}.jar"
-//    }
-//
-//    forge {
-//        projectName = "forge"
-//        jarLocation = "build/libs/${mod_id}-forge-${minecraft_version}-${project.version}.jar"
-//
-//        mixin "${mod_id}.forge.mixins.json"
-//    }
-//}
+// jar-relocator (ASM-based) rewrites the .class bytecode - including
+// META-INF/services entries, which it renames and rewrites correctly in one pass.
+// Everything else (mixins configs, refmaps, fabric.mod.json/forge.mods.toml) is
+// plain text containing the same group string, so a single substring replace keeps
+// them all in sync with the relocated bytecode - no bespoke per-file-type handling.
+def relocateLoaderJar(File input, File output, String loaderPrefix, String group) {
+  def relocatedJar = new File(output.parentFile, "${output.name}.bytecode-relocated.jar")
+  relocatedJar.delete()
+  new JarRelocator(input, relocatedJar, [new Relocation(group, "${loaderPrefix}.${group}")]).run()
 
-subprojects {
-    apply plugin: 'java'
+  def workDir = new File(output.parentFile, "${loaderPrefix}-work")
+  if (workDir.exists()) workDir.deleteDir()
+  workDir.mkdirs()
+  ant.unzip(src: relocatedJar, dest: workDir)
 
-    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-    jar {
-        manifest {
-            attributes([
-                'Specification-Title'     : mod_name,
-                'Specification-Vendor'    : mod_author,
-                'Specification-Version'   : project.jar.archiveVersion,
-                'Implementation-Title'    : project.name,
-                'Implementation-Version'  : project.jar.archiveVersion,
-                'Implementation-Vendor'   : mod_author,
-                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                'Timestamp'               : System.currentTimeMillis(),
-                'Built-On-Java'           : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})",
-                'Built-On-Minecraft'      : minecraft_version
-            ])
-        }
+  // Rename loader-identifying resources so fabric's and forge's copies of the
+  // same-named file (e.g. both ship a "<mod_id>.mixins.json") don't collide on merge.
+  def renames = [:]
+  workDir.eachFileRecurse { file ->
+    if (!file.isFile()) return
+    if (file.name.endsWith('.accesswidener')) {
+      renames[file.name] = "${loaderPrefix}-${file.name}"
+    } else if (file.name.endsWith('.json') && isProbablyTextFile(file)) {
+      def text = file.text
+      if (text.contains('"package":') || text.contains('"mappings":') || text.contains('"data":')) {
+        renames[file.name] = "${loaderPrefix}-${file.name}"
+      }
     }
-
-    repositories {
-        mavenCentral()
-        maven {
-            name = 'Sponge / Mixin'
-            url = 'https://repo.spongepowered.org/repository/maven-public/'
-        }
-        maven {
-            name = 'ParchmentMC'
-            url = 'https://maven.parchmentmc.org'
-        }
-        maven {
-            url "https://cursemaven.com"
-            content {
-                includeGroup "curse.maven"
-            }
-        }
+  }
+  renames.each { oldName, newName ->
+    workDir.eachFileRecurse { file ->
+      if (file.isFile() && file.name == oldName) {
+        file.renameTo(new File(file.parentFile, newName))
+      }
     }
+  }
 
-    tasks.withType(JavaCompile).configureEach {
+  // Fix every reference to the relocated package or a renamed file: mixins.json's
+  // "package"/"refmap" fields, refmap keys (which use the slash form of the package,
+  // e.g. "io/github/x/Mixin"), fabric.mod.json entrypoints/mixins list, and
+  // forge.mods.toml's [[mixins]] config values.
+  def groupPath = group.replace('.', '/')
+  def replacements = [(group): "${loaderPrefix}.${group}", (groupPath): "${loaderPrefix}/${groupPath}"] + renames
+  workDir.eachFileRecurse { file ->
+    // META-INF/services entries were already correctly renamed/rewritten by
+    // JarRelocator itself; touching them again here would double the prefix.
+    if (!file.isFile() || file.name.endsWith('.class') || !isProbablyTextFile(file)) return
+    if (file.parentFile.name == 'services' && file.parentFile.parentFile?.name == 'META-INF') return
+    // MANIFEST.MF hard-wraps lines at 72 bytes, so a naive substring replace on the raw
+    // text can miss a match that the wrap splits across two lines (e.g. Forge's
+    // "MixinConfigs" value). Handle it separately below via the real Manifest parser.
+    if (file.name == 'MANIFEST.MF' && file.parentFile.name == 'META-INF') return
+    def text = file.text
+    def newText = text
+    replacements.each { from, to -> newText = newText.replace(from, to) }
+    if (newText != text) file.text = newText
+  }
 
-        it.options.encoding = 'UTF-8'
-        it.options.getRelease().set(17)
+  def manifestFile = new File(workDir, 'META-INF/MANIFEST.MF')
+  if (manifestFile.exists()) {
+    def jarManifest
+    manifestFile.withInputStream { jarManifest = new java.util.jar.Manifest(it) }
+    def attributes = jarManifest.mainAttributes
+    def updates = [:]
+    attributes.each { key, value ->
+      def newValue = value.toString()
+      replacements.each { from, to -> newValue = newValue.replace(from, to) }
+      if (newValue != value.toString()) updates[key.toString()] = newValue
     }
+    updates.each { name, value -> attributes.putValue(name, value) }
+    manifestFile.withOutputStream { jarManifest.write(it) }
+  }
 
-    processResources {
-        def expandProps = [
-                "version": version,
-                "group": project.group, //Else we target the task's group.
-                "minecraft_version": minecraft_version,
-                "forge_version": forge_version,
-                "forge_loader_version_range": forge_loader_version_range,
-                "forge_version_range": forge_version_range,
-                "minecraft_version_range": minecraft_version_range,
-                "fabric_version": fabric_version,
-                "fabric_loader_version": fabric_loader_version,
-                "mod_name": mod_name,
-                "mod_author": mod_author,
-                "mod_id": mod_id,
-                "license": license,
-                "description": project.description,
-                "parchment_version": parchment_version,
-                "credits": credits
-        ]
+  output.delete()
+  ant.zip(destFile: output, basedir: workDir)
+  workDir.deleteDir()
+  relocatedJar.delete()
+}
 
-        filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', '*.mixins.json']) {
-            expand expandProps
+tasks.register('mergeJarsCustom', Jar) {
+  group = 'distribution'
+  description = 'Relocates :fabric and :forge output under loader-specific packages (same approach as Forgix) and merges them into build/merged/.'
+
+  def fabricJarTask = project(':fabric').tasks.named('remapJar')
+  def forgeJarTask = project(':forge').tasks.named('reobfJar')
+
+  dependsOn(fabricJarTask, forgeJarTask)
+
+  def workDir = layout.buildDirectory.dir('tmp/mergeJarsCustom')
+  def fabricRelocated = workDir.map { it.file('fabric-relocated.jar') }
+  def forgeRelocated = workDir.map { it.file('forge-relocated.jar') }
+
+  destinationDirectory.set(layout.buildDirectory.dir('merged'))
+  archiveFileName.set("${mod_id}-merged-${minecraft_version}-${version}.jar")
+
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+  doFirst {
+    workDir.get().asFile.mkdirs()
+    relocateLoaderJar(fabricJarTask.get().archiveFile.get().asFile, fabricRelocated.get().asFile, 'fabric', project.group.toString())
+    relocateLoaderJar(forgeJarTask.get().archiveFile.get().asFile, forgeRelocated.get().asFile, 'forge', project.group.toString())
+
+    // The Jar task always (re)writes its own META-INF/MANIFEST.MF after copying files
+    // in via from(zipTree(...)), which silently clobbers whatever manifest entries
+    // came from the source jars - including Forge's "MixinConfigs" attribute (legacy
+    // Forge discovers mixin configs from the manifest, not mods.toml). Merge those
+    // attributes into this task's own manifest so they actually make it into the jar.
+    [fabricRelocated, forgeRelocated].each { jarProvider ->
+      new java.util.jar.JarFile(jarProvider.get().asFile).withCloseable { jarFile ->
+        jarFile.manifest?.mainAttributes?.each { key, value ->
+          def name = key.toString()
+          if (name != 'Manifest-Version') {
+            manifest.attributes([(name): value.toString()])
+          }
         }
-        inputs.properties(expandProps)
+      }
     }
+  }
+
+  from(zipTree(fabricRelocated))
+  from(zipTree(forgeRelocated))
+}
+
+// Root project has no 'build' task of its own - `./gradlew build` currently works by
+// Gradle running 'build' in every subproject that has one. Define it explicitly so we
+// can also hang mergeJarsCustom off it.
+tasks.register('build') {
+  group = 'build'
+  description = 'Aggregate build: builds common/fabric/forge and produces the merged jar.'
+  dependsOn(':common:build', ':fabric:build', ':forge:build', 'mergeJarsCustom')
 }
