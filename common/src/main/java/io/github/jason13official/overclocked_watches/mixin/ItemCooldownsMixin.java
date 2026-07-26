@@ -4,6 +4,8 @@ import io.github.jason13official.overclocked_watches.api.common.data.CoolDownRec
 import io.github.jason13official.overclocked_watches.api.common.data.IItemCooldowns;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemCooldowns;
 import org.spongepowered.asm.mixin.Final;
@@ -15,7 +17,7 @@ public abstract class ItemCooldownsMixin implements IItemCooldowns {
 
   @Shadow
   @Final
-  private Map<Item, ItemCooldowns.CooldownInstance> cooldowns;
+  private Map<Identifier, ItemCooldowns.CooldownInstance> cooldowns;
   @Shadow
   private int tickCount;
 
@@ -23,18 +25,20 @@ public abstract class ItemCooldownsMixin implements IItemCooldowns {
   }
 
   @Shadow
-  public abstract void addCooldown(Item var1, int var2);
+  public abstract void addCooldown(Identifier cooldownGroup, int time);
 
   public List<CoolDownRecord> overclocked_watches$getCooldownTicks() {
     return this.cooldowns.entrySet().stream().map((e) -> {
-      AccessorCooldownInstance instance = (AccessorCooldownInstance) e.getValue();
-      return new CoolDownRecord(e.getKey(), instance.getEndTime() - this.tickCount, instance.getEndTime() - instance.getStartTime());
+      AccessorCooldownInstance instance = (AccessorCooldownInstance) (Object) e.getValue();
+      Item item = BuiltInRegistries.ITEM.getValue(e.getKey());
+      return new CoolDownRecord(item, instance.getEndTime() - this.tickCount, instance.getEndTime() - instance.getStartTime());
     }).toList();
   }
 
   public void overclocked_watches$addCoolDown(CoolDownRecord cd) {
-    this.addCooldown(cd.item(), 50000);
-    AccessorCooldownInstance instance = (AccessorCooldownInstance) this.cooldowns.get(cd.item());
+    Identifier group = BuiltInRegistries.ITEM.getKey(cd.item());
+    this.addCooldown(group, 50000);
+    AccessorCooldownInstance instance = (AccessorCooldownInstance) (Object) this.cooldowns.get(group);
     int end = this.tickCount + cd.remain();
     int start = end - cd.total();
     instance.setStartTime(start);

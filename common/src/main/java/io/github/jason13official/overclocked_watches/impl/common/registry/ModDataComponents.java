@@ -5,13 +5,13 @@ import io.github.jason13official.overclocked_watches.OverclockedWatches;
 import java.util.function.BiConsumer;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class ModDataComponents {
 
   public static DataComponentType<Integer> CHARGES;
 
-  public static void register(BiConsumer<DataComponentType<?>, ResourceLocation> consumer) {
+  public static void register(BiConsumer<DataComponentType<?>, Identifier> consumer) {
 
     CHARGES = DataComponentType.<Integer>builder()
         .persistent(Codec.INT)

@@ -3,14 +3,14 @@ package io.github.jason13official.overclocked_watches.mixin;
 import io.github.jason13official.overclocked_watches.api.common.data.IEntityDataSaver;
 import io.github.jason13official.overclocked_watches.impl.common.util.OverclockedWatchesUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public abstract class FabricEntityMixin implements IEntityDataSaver {
@@ -27,16 +27,14 @@ public abstract class FabricEntityMixin implements IEntityDataSaver {
   }
 
   @Inject(method = "saveWithoutId", at = @At("HEAD"))
-  protected void injectWriteMethod(CompoundTag nbt, CallbackInfoReturnable info) {
+  protected void injectWriteMethod(ValueOutput output, CallbackInfo info) {
     if (persistentData != null) {
-      nbt.put(OverclockedWatchesUtil.PERSISTENT_DATA_TAG, persistentData);
+      output.store(OverclockedWatchesUtil.PERSISTENT_DATA_TAG, CompoundTag.CODEC, persistentData);
     }
   }
 
   @Inject(method = "load", at = @At("HEAD"))
-  protected void injectReadMethod(CompoundTag nbt, CallbackInfo info) {
-    if (nbt.contains(OverclockedWatchesUtil.PERSISTENT_DATA_TAG, Tag.TAG_COMPOUND)) {
-      persistentData = nbt.getCompound(OverclockedWatchesUtil.PERSISTENT_DATA_TAG);
-    }
+  protected void injectReadMethod(ValueInput input, CallbackInfo info) {
+    persistentData = input.read(OverclockedWatchesUtil.PERSISTENT_DATA_TAG, CompoundTag.CODEC).orElse(null);
   }
 }

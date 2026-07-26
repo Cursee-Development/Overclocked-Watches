@@ -8,9 +8,7 @@
     "FabricEntityMixin",
     "FabricServerPlayerMixin"
   ],
-  "client": [
-    "FabricPlayerRendererMixin"
-  ],
+  "client": [],
   "server": [],
   "injectors": {
     "defaultRequire": 1

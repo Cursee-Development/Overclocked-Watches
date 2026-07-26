@@ -5,6 +5,7 @@ import io.github.jason13official.overclocked_watches.impl.common.network.packet.
 import io.github.jason13official.overclocked_watches.impl.common.network.packet.DayNightC2SPayload;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -18,7 +19,7 @@ public class ForgeNetwork {
     registrar.playToServer(DayNightC2SPayload.TYPE, DayNightC2SPayload.STREAM_CODEC,
         (payload, context) -> {
           ServerPlayer player = (ServerPlayer) context.player();
-          DayNightC2SHandler.handle(player.getServer(), player);
+          DayNightC2SHandler.handle(player.level().getServer(), player);
         });
 
     registrar.playToClient(ConfigSyncPayload.TYPE, ConfigSyncPayload.STREAM_CODEC,
@@ -30,6 +31,6 @@ public class ForgeNetwork {
   }
 
   public static void sendToServer(CustomPacketPayload payload) {
-    PacketDistributor.sendToServer(payload);
+    ClientPacketDistributor.sendToServer(payload);
   }
 }

@@ -6,7 +6,7 @@ import io.github.jason13official.overclocked_watches.platform.Services;
 import java.nio.file.Path;
 import java.util.function.Supplier;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
@@ -75,9 +75,9 @@ public interface IPlatformHelper {
 
   ItemStack getEquippedWatch(Player player, WatchTier tier);
 
-  Item getItemFromRL(ResourceLocation rl);
+  Item getItemFromRL(Identifier rl);
 
-  ResourceLocation getRLFromItem(Item item);
+  Identifier getRLFromItem(Item item);
 
   CompoundTag getPersistentData(Entity entity);
 }

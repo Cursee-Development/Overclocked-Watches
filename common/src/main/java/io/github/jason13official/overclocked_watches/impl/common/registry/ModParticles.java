@@ -9,7 +9,7 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class ModParticles {
 
@@ -17,7 +17,7 @@ public class ModParticles {
   public static SimpleParticleType DIAMOND_WATCH_GROWTH; // = new SimpleLimitedParticle();
   public static SimpleParticleType NETHERITE_WATCH_GROWTH; // = new SimpleLimitedParticle();
 
-  public static void register(BiConsumer<ParticleType<?>, ResourceLocation> consumer) {
+  public static void register(BiConsumer<ParticleType<?>, Identifier> consumer) {
 
     GOLDEN_WATCH_GROWTH = new SimpleLimitedParticle();
     DIAMOND_WATCH_GROWTH = new SimpleLimitedParticle();

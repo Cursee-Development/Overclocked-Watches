@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -31,7 +31,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -76,7 +76,7 @@ public class OverclockedWatchesNeoForge {
       Player player = consumer.getEntity();
       OverclockedWatchesUtil.loadCooldowns(player.getPersistentData(), player);
       if (Services.PLATFORM.isDevelopmentEnvironment()) {
-        Constants.LOG.info("[OverclockedWatches] loadCooldowns on login for {}", player.getGameProfile().getName());
+        Constants.LOG.info("[OverclockedWatches] loadCooldowns on login for {}", player.getGameProfile().name());
       }
     });
 
@@ -84,18 +84,18 @@ public class OverclockedWatchesNeoForge {
       Player player = consumer.getEntity();
       OverclockedWatchesUtil.saveCooldowns(player.getPersistentData(), player);
       if (Services.PLATFORM.isDevelopmentEnvironment()) {
-        Constants.LOG.info("[OverclockedWatches] saveCooldowns on SaveToFile for {}", player.getGameProfile().getName());
+        Constants.LOG.info("[OverclockedWatches] saveCooldowns on SaveToFile for {}", player.getGameProfile().name());
       }
     });
 
     NeoForge.EVENT_BUS.addListener((Consumer<PlayerEvent.Clone>) consumer ->
         OverclockedWatchesUtil.copyCooldowns(consumer.getOriginal(), consumer.getEntity()));
 
-    NeoForge.EVENT_BUS.addListener((Consumer<AddReloadListenerEvent>) event -> {
-      event.addListener(new ResourceReloadListener());
+    NeoForge.EVENT_BUS.addListener((Consumer<AddServerReloadListenersEvent>) event -> {
+      event.addListener(OverclockedWatches.identifier(Constants.MOD_ID), new ResourceReloadListener());
     });
 
-    if (FMLLoader.getDist() == Dist.CLIENT) {
+    if (FMLLoader.getCurrent().getDist() == Dist.CLIENT) {
       new OverclockedWatchesClientNeoForge(EVENT_BUS);
     }
   }
@@ -106,7 +106,7 @@ public class OverclockedWatchesNeoForge {
         ModItems.GOLDEN_WATCH, ModItems.DIAMOND_WATCH, ModItems.NETHERITE_WATCH);
   }
 
-  public <T> void bind(ResourceKey<Registry<T>> registryKey, Consumer<BiConsumer<T, ResourceLocation>> source) {
+  public <T> void bind(ResourceKey<Registry<T>> registryKey, Consumer<BiConsumer<T, Identifier>> source) {
 
     EVENT_BUS.addListener((Consumer<RegisterEvent>) event -> {
       if (registryKey.equals(event.getRegistryKey())) {

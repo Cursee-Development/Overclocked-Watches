@@ -10,13 +10,16 @@ import io.github.jason13official.overclocked_watches.impl.common.registry.ModIte
 import io.github.jason13official.overclocked_watches.impl.common.registry.ModParticles;
 import io.github.jason13official.overclocked_watches.platform.Services;
 import java.util.Objects;
-import net.minecraft.ResourceLocationException;
+import java.util.Optional;
+import net.minecraft.IdentifierException;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.clock.WorldClock;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -30,25 +33,26 @@ public class OverclockedWatchesUtil {
       data = ((IEntityDataSaver) player).overclocked_watches$getPersistentData();
     }
     if (data.contains(PERSISTENT_DATA_TAG)) {
-      ListTag cooldowns = data.getList(PERSISTENT_DATA_TAG, Tag.TAG_COMPOUND);
+      ListTag cooldowns = data.getListOrEmpty(PERSISTENT_DATA_TAG);
       cooldowns.forEach((tag) -> {
         if (tag instanceof CompoundTag compoundTag) {
           try {
-            ResourceLocation rl = ResourceLocation.parse(compoundTag.getString("item"));
+            Identifier rl = Identifier.parse(compoundTag.getStringOr("item", ""));
             Item item = Services.PLATFORM.getItemFromRL(rl);
             if (item != (ModItems.GOLDEN_WATCH) && item != (ModItems.DIAMOND_WATCH) && item != (ModItems.NETHERITE_WATCH)) {
               return;
             }
-            player.getCooldowns().removeCooldown(item);
-            ((IItemCooldowns) player.getCooldowns()).overclocked_watches$addCoolDown(new CoolDownRecord(item, compoundTag.getInt("remain"), compoundTag.getInt("total")));
-          } catch (ResourceLocationException e) {
+            player.getCooldowns().removeCooldown(Objects.requireNonNull(Services.PLATFORM.getRLFromItem(item)));
+            ((IItemCooldowns) player.getCooldowns()).overclocked_watches$addCoolDown(
+                new CoolDownRecord(item, compoundTag.getIntOr("remain", 0), compoundTag.getIntOr("total", 0)));
+          } catch (IdentifierException e) {
             Constants.LOG.error("Failed to parse item, that's weird.", e);
           }
 
         }
       });
       if (Services.PLATFORM.isDevelopmentEnvironment()) {
-        Constants.LOG.info("[OverclockedWatches] loaded {} cooldown(s) for {}", cooldowns.size(), player.getGameProfile().getName());
+        Constants.LOG.info("[OverclockedWatches] loaded {} cooldown(s) for {}", cooldowns.size(), player.getGameProfile().name());
       }
     }
   }
@@ -64,7 +68,7 @@ public class OverclockedWatchesUtil {
     });
     tag.put(PERSISTENT_DATA_TAG, cooldowns);
     if (Services.PLATFORM.isDevelopmentEnvironment()) {
-      Constants.LOG.info("[OverclockedWatches] saved {} cooldown(s) for {}", cooldowns.size(), player.getGameProfile().getName());
+      Constants.LOG.info("[OverclockedWatches] saved {} cooldown(s) for {}", cooldowns.size(), player.getGameProfile().name());
     }
   }
 
@@ -76,9 +80,20 @@ public class OverclockedWatchesUtil {
 
   public static void addGrowthParticles(WatchTier tier, ServerLevel level, BlockPos blockPos, int particleCount) {
     for (int i = 0; i < particleCount; ++i) {
-      level.sendParticles(ModParticles.getGrowthParticle(tier), ((double) blockPos.getX()) + level.random.nextDouble(), ((double) blockPos.getY()) + 0.5D,
-          ((double) blockPos.getZ()) + level.random.nextDouble(), 1, 0.0D, 0.0D, 0.0D, 0.2D);
+      level.sendParticles(ModParticles.getGrowthParticle(tier), ((double) blockPos.getX()) + level.getRandom().nextDouble(), ((double) blockPos.getY()) + 0.5D,
+          ((double) blockPos.getZ()) + level.getRandom().nextDouble(), 1, 0.0D, 0.0D, 0.0D, 0.2D);
     }
+  }
+
+  /// Advances the given level's default day/night clock by the given number of ticks, wrapping at a single day's length.
+  /// No-ops if the level's dimension has no default clock (e.g. the nether).
+  public static void advanceDayTime(ServerLevel level, long amount) {
+    Optional<Holder<WorldClock>> clock = level.dimensionType().defaultClock();
+    if (clock.isEmpty()) {
+      return;
+    }
+    long current = level.clockManager().getTotalTicks(clock.get());
+    level.clockManager().setTotalTicks(clock.get(), (current + amount) % 24_000L);
   }
 
   public static boolean consumeCharge(ItemStack itemInHand) {

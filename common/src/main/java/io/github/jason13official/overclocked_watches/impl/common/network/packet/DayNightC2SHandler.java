@@ -32,7 +32,8 @@ public class DayNightC2SHandler {
     }
 
     ItemCooldowns cooldowns = player.getCooldowns();
-    boolean onCooldown = cooldowns.isOnCooldown(ModItems.NETHERITE_WATCH) || cooldowns.isOnCooldown(ModItems.DIAMOND_WATCH) || cooldowns.isOnCooldown(ModItems.GOLDEN_WATCH);
+    boolean onCooldown = cooldowns.isOnCooldown(new ItemStack(ModItems.NETHERITE_WATCH)) || cooldowns.isOnCooldown(new ItemStack(ModItems.DIAMOND_WATCH))
+        || cooldowns.isOnCooldown(new ItemStack(ModItems.GOLDEN_WATCH));
     if (onCooldown) {
       return;
     }
@@ -60,21 +61,21 @@ public class DayNightC2SHandler {
       applyCooldowns(player, 20 * 60 * WatchTier.GOLDEN.getCooldownMinutes());
     }
 
-    player.serverLevel().playLocalSound(player.position().x, player.position().y, player.position().z, SoundEvents.BELL_RESONATE, SoundSource.AMBIENT, 0.5f, 0.5f, false);
-    player.serverLevel().addParticle(ParticleTypes.END_ROD, player.position().x, player.position().y, player.position().z, 0, 0.005, 0);
+    player.level().playLocalSound(player.position().x, player.position().y, player.position().z, SoundEvents.BELL_RESONATE, SoundSource.AMBIENT, 0.5f, 0.5f, false);
+    player.level().addParticle(ParticleTypes.END_ROD, player.position().x, player.position().y, player.position().z, 0, 0.005, 0);
     player.sendSystemMessage(Component.translatable("magic.overclocked_watches.charge_consumed"));
   }
 
   public static void applyCooldowns(Player player, int lengthInTicks) {
-    player.getCooldowns().addCooldown(ModItems.NETHERITE_WATCH, lengthInTicks);
-    player.getCooldowns().addCooldown(ModItems.DIAMOND_WATCH, lengthInTicks);
-    player.getCooldowns().addCooldown(ModItems.GOLDEN_WATCH, lengthInTicks);
+    player.getCooldowns().addCooldown(new ItemStack(ModItems.NETHERITE_WATCH), lengthInTicks);
+    player.getCooldowns().addCooldown(new ItemStack(ModItems.DIAMOND_WATCH), lengthInTicks);
+    player.getCooldowns().addCooldown(new ItemStack(ModItems.GOLDEN_WATCH), lengthInTicks);
   }
 
   public static void addTime(MinecraftServer pSource, long pAmount) {
     for (ServerLevel level : pSource.getAllLevels()) {
       if (!ServerModConfig.USE_LONG_TIME_DELTA.get()) {
-        level.setDayTime(level.getDayTime() + pAmount);
+        OverclockedWatchesUtil.advanceDayTime(level, pAmount);
       }
     }
 

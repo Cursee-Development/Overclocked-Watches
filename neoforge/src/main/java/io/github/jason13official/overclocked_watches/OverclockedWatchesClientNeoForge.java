@@ -1,6 +1,5 @@
 package io.github.jason13official.overclocked_watches;
 
-import io.github.jason13official.overclocked_watches.client.ArmRenderHandler;
 import io.github.jason13official.overclocked_watches.client.KeyInputHandlerForge;
 import io.github.jason13official.overclocked_watches.core.network.ForgeNetwork;
 import io.github.jason13official.overclocked_watches.impl.client.DayNightKeyPressHandler;
@@ -32,7 +31,7 @@ import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import top.theillusivec4.curios.client.render.CuriosLayer;
+import top.theillusivec4.curios.client.CuriosLayer;
 
 public class OverclockedWatchesClientNeoForge {
 
@@ -45,8 +44,6 @@ public class OverclockedWatchesClientNeoForge {
     modEventBus.addListener(this::onAddEntityRendererLayers);
     modEventBus.addListener(this::onRegisterParticleProviders);
     modEventBus.addListener(this::onRegisterKeyMappings);
-
-    ArmRenderHandler.setup();
 
     NeoForge.EVENT_BUS.addListener(this::onKeyInput);
     NeoForge.EVENT_BUS.addListener((Consumer<ClientTickEvent.Pre>) event -> {
@@ -81,17 +78,17 @@ public class OverclockedWatchesClientNeoForge {
         EntityType.ZOMBIFIED_PIGLIN);
     loop:
     for (EntityType<?> entity : entities) {
-      EntityRenderer<?> renderer = event.getRenderer(entity);
+      EntityRenderer<?, ?> renderer = event.getRenderer(entity);
       if (renderer == null) {
         continue;
       }
-      LivingEntityRenderer livingEntityRenderer = (LivingEntityRenderer<?, ?>) renderer;
-      for (RenderLayer<?, ?> layer : ((LivingEntityRendererAccessor<?, ?>) livingEntityRenderer).getLayers()) {
+      LivingEntityRenderer livingEntityRenderer = (LivingEntityRenderer<?, ?, ?>) renderer;
+      for (RenderLayer<?, ?> layer : ((LivingEntityRendererAccessor<?, ?, ?>) livingEntityRenderer).getLayers()) {
         if (layer instanceof CuriosLayer<?, ?>) {
           continue loop;
         }
       }
-      livingEntityRenderer.addLayer(new CuriosLayer<>(livingEntityRenderer));
+      livingEntityRenderer.addLayer(new CuriosLayer<>(livingEntityRenderer, event.getContext()));
     }
   }
 

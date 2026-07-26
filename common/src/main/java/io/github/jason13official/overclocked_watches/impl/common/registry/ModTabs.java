@@ -4,7 +4,7 @@ import io.github.jason13official.overclocked_watches.OverclockedWatches;
 import io.github.jason13official.overclocked_watches.platform.Services;
 import java.util.function.BiConsumer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
@@ -12,7 +12,7 @@ public class ModTabs {
 
   public static CreativeModeTab OVERCLOCKED_WATCHES;
 
-  public static void register(BiConsumer<CreativeModeTab, ResourceLocation> consumer) {
+  public static void register(BiConsumer<CreativeModeTab, Identifier> consumer) {
 
     OVERCLOCKED_WATCHES = Services.PLATFORM.tabBuilder()
         .icon(() -> new ItemStack(ModItems.DIAMOND_WATCH))

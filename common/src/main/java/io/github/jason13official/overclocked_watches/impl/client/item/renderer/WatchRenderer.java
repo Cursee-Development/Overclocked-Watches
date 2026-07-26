@@ -1,7 +1,6 @@
 package io.github.jason13official.overclocked_watches.impl.client.item.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.jason13official.overclocked_watches.api.client.renderer.IWatchRenderer;
 import io.github.jason13official.overclocked_watches.impl.client.item.model.ArmsModel;
 import io.github.jason13official.overclocked_watches.impl.common.item.WatchTier;
@@ -9,25 +8,26 @@ import io.github.jason13official.overclocked_watches.impl.common.registry.ModIte
 import io.github.jason13official.overclocked_watches.platform.Services;
 import java.util.Locale;
 import java.util.function.Function;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.state.ArmedEntityRenderState;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.PlayerSkin;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class WatchRenderer implements IWatchRenderer {
 
-  private final ResourceLocation wideTexture;
-  private final ResourceLocation slimTexture;
+  private final Identifier wideTexture;
+  private final Identifier slimTexture;
   private final ArmsModel wideModel;
   private final ArmsModel slimModel;
 
@@ -39,7 +39,7 @@ public class WatchRenderer implements IWatchRenderer {
     this(IWatchRenderer.getTexturePath(wideTexture), IWatchRenderer.getTexturePath(slimTexture), model);
   }
 
-  public WatchRenderer(ResourceLocation wideTexture, ResourceLocation slimTexture, Function<Boolean, ArmsModel> model) {
+  public WatchRenderer(Identifier wideTexture, Identifier slimTexture, Function<Boolean, ArmsModel> model) {
     this.wideTexture = wideTexture;
     this.slimTexture = slimTexture;
     this.wideModel = model.apply(false);
@@ -63,11 +63,11 @@ public class WatchRenderer implements IWatchRenderer {
     return null;
   }
 
-  protected static boolean hasSlimArms(Entity entity) {
-    return entity instanceof AbstractClientPlayer player && player.getSkin().model() == PlayerSkin.Model.SLIM;
+  protected static boolean hasSlimArms(LivingEntityRenderState state) {
+    return state instanceof AvatarRenderState avatarState && avatarState.skin.model() == PlayerModelType.SLIM;
   }
 
-  protected ResourceLocation getTexture(boolean hasSlimArms) {
+  protected Identifier getTexture(boolean hasSlimArms) {
     return hasSlimArms ? slimTexture : wideTexture;
   }
 
@@ -76,60 +76,68 @@ public class WatchRenderer implements IWatchRenderer {
   }
 
   @Override
-  public void render(
+  public void submit(
       ItemStack stack,
-      LivingEntity entity,
+      EntityModel<? extends LivingEntityRenderState> contextModel,
       int slotIndex,
       PoseStack poseStack,
-      MultiBufferSource multiBufferSource,
+      SubmitNodeCollector submit,
       int light,
-      float limbSwing,
-      float limbSwingAmount,
-      float partialTicks,
-      float ageInTicks,
-      float netHeadYaw,
-      float headPitch
+      LivingEntityRenderState state,
+      float limbAngle,
+      float limbDistance
   ) {
-    boolean hasSlimArms = hasSlimArms(entity);
+    if (!(state instanceof ArmedEntityRenderState armedState)) {
+      return;
+    }
+
+    boolean hasSlimArms = hasSlimArms(state);
     ArmsModel model = getModel(hasSlimArms);
     InteractionHand hand = slotIndex % 2 == 0 ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
-    HumanoidArm handSide = hand == InteractionHand.MAIN_HAND ? entity.getMainArm() : entity.getMainArm().getOpposite();
+    HumanoidArm handSide = hand == InteractionHand.MAIN_HAND ? armedState.mainArm : armedState.mainArm.getOpposite();
 
-    model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-    model.prepareMobModel(entity, limbSwing, limbSwingAmount, partialTicks);
-    IWatchRenderer.followBodyRotations(entity, model);
-
-    renderArm(model, poseStack, multiBufferSource, handSide, light, hasSlimArms, stack.hasFoil());
-  }
-
-  protected void renderArm(ArmsModel model, PoseStack matrixStack, MultiBufferSource buffer, HumanoidArm handSide, int light, boolean hasSlimArms, boolean hasFoil) {
-    RenderType renderType = model.renderType(getTexture(hasSlimArms));
-    VertexConsumer vertexBuilder = ItemRenderer.getFoilBuffer(buffer, renderType, false, hasFoil);
-    model.renderArm(handSide, matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, -1);
-  }
-
-  public final void renderFirstPersonArm(PoseStack matrixStack, MultiBufferSource buffer, int light, AbstractClientPlayer player, HumanoidArm side, boolean hasFoil) {
-    if (!player.isSpectator()) {
-      boolean hasSlimArms = hasSlimArms(player);
-      ArmsModel model = getModel(hasSlimArms);
-
-      ModelPart arm = side == HumanoidArm.LEFT ? model.leftArm : model.rightArm;
-
-      model.setAllVisible(false);
-      arm.visible = true;
-
-      model.crouching = false;
-      model.attackTime = model.swimAmount = 0;
-      model.setupAnim(player, 0, 0, 0, 0, 0);
-      arm.xRot = 0;
-
-      renderFirstPersonArm(model, arm, matrixStack, buffer, light, hasSlimArms, hasFoil);
+    poseStack.pushPose();
+    if (contextModel instanceof HumanoidModel<?> humanoidModel) {
+      model.root().loadPose(humanoidModel.root().storePose());
+      model.head.loadPose(humanoidModel.head.storePose());
+      model.body.loadPose(humanoidModel.body.storePose());
+      model.leftArm.loadPose(humanoidModel.leftArm.storePose());
+      model.rightArm.loadPose(humanoidModel.rightArm.storePose());
+      model.leftLeg.loadPose(humanoidModel.leftLeg.storePose());
+      model.rightLeg.loadPose(humanoidModel.rightLeg.storePose());
     }
+    model.prepareArm(handSide);
+
+    RenderType renderType = model.renderType(getTexture(hasSlimArms));
+    submit.submitModelPart(model.root(), poseStack, renderType, light, OverlayTexture.NO_OVERLAY, null, false, stack.hasFoil());
+    poseStack.popPose();
   }
 
-  protected void renderFirstPersonArm(ArmsModel model, ModelPart arm, PoseStack matrixStack, MultiBufferSource buffer, int light, boolean hasSlimArms, boolean hasFoil) {
+  public final void renderFirstPersonArm(ModelPart vanillaArm, PoseStack matrixStack, SubmitNodeCollector submit, int light, boolean hasSlimArms, HumanoidArm side, boolean hasFoil) {
+
+    ArmsModel model = getModel(hasSlimArms);
+    model.prepareArm(side);
+    ModelPart ourArm = side == HumanoidArm.LEFT ? model.leftArm : model.rightArm;
+    ourArm.resetPose();
+
+    matrixStack.pushPose();
+    vanillaArm.translateAndRotate(matrixStack);
+    matrixStack.translate(side == HumanoidArm.RIGHT ? -0.0625F : 0.0625F, 0.625F, 0.0F);
+
     RenderType renderType = model.renderType(getTexture(hasSlimArms));
-    VertexConsumer builder = ItemRenderer.getFoilBuffer(buffer, renderType, false, hasFoil);
-    arm.render(matrixStack, builder, light, OverlayTexture.NO_OVERLAY);
+    submit.submitModelPart(model.root(), matrixStack, renderType, light, OverlayTexture.NO_OVERLAY, null, false, hasFoil);
+    matrixStack.popPose();
+  }
+
+  /// Variant for platforms (e.g. Curios) that already position the PoseStack at the arm before calling in.
+  public final void renderFirstPersonArm(PoseStack matrixStack, SubmitNodeCollector submit, int light, boolean hasSlimArms, HumanoidArm side, boolean hasFoil) {
+
+    ArmsModel model = getModel(hasSlimArms);
+    model.prepareArm(side);
+    ModelPart ourArm = side == HumanoidArm.LEFT ? model.leftArm : model.rightArm;
+    ourArm.resetPose();
+
+    RenderType renderType = model.renderType(getTexture(hasSlimArms));
+    submit.submitModelPart(model.root(), matrixStack, renderType, light, OverlayTexture.NO_OVERLAY, null, false, hasFoil);
   }
 }

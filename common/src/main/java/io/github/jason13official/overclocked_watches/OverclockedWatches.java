@@ -3,7 +3,7 @@ package io.github.jason13official.overclocked_watches;
 import io.github.jason13official.overclocked_watches.impl.common.ModConfigIO;
 import io.github.jason13official.overclocked_watches.impl.common.util.TimeManager;
 import io.github.jason13official.overclocked_watches.platform.Services;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class OverclockedWatches {
 
@@ -13,7 +13,7 @@ public class OverclockedWatches {
     ModConfigIO.load(Services.PLATFORM.getGameDirectory());
   }
 
-  public static ResourceLocation identifier(String value) {
-    return ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, value);
+  public static Identifier identifier(String value) {
+    return Identifier.fromNamespaceAndPath(Constants.MOD_ID, value);
   }
 }

@@ -8,8 +8,8 @@
         "${mod_author}"
     ],
     "contact": {
-        "homepage": "https://github.com/Cursee-Development",
-        "sources": "https://github.com/Cursee-Development"
+        "homepage": "${mod_url}",
+        "sources": "${mod_url}"
     },
     "license": "${license}",
     "icon": "${mod_id}.png",
@@ -29,7 +29,7 @@
     "depends": {
         "fabricloader": ">=${fabric_loader_version}",
         "fabric-api": "*",
-        "minecraft": "${minecraft_version}",
+        "minecraft": "${fabric_minecraft_version_range}",
         "java": ">=${java_version}",
         "monolib": "*",
         "trinkets": "*"

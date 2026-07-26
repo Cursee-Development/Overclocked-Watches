@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class RendererLayers {
 
@@ -29,7 +29,7 @@ public class RendererLayers {
   }
 
   public static ModelLayerLocation createLayerLocation(String name) {
-    return new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, name), name);
+    return new ModelLayerLocation(Identifier.fromNamespaceAndPath(Constants.MOD_ID, name), name);
   }
 
   public static Supplier<LayerDefinition> layer(Supplier<MeshDefinition> mesh, int textureWidth, int textureHeight) {

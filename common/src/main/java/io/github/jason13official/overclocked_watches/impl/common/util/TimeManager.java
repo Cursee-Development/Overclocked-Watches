@@ -31,13 +31,12 @@ public class TimeManager {
 
   public void operate(ServerLevel level) {
     // System.out.println("operating on server");
-    level.setDayTime((level.getDayTime() + ServerModConfig.LONG_TIME_DELTA.get()) % 24_000L);
+    OverclockedWatchesUtil.advanceDayTime(level, ServerModConfig.LONG_TIME_DELTA.get());
     decrementRemainingTime();
   }
 
   public void operate(ClientLevel level) {
-    // System.out.println("operating on client");
-    level.setDayTime((level.getDayTime() + ServerModConfig.LONG_TIME_DELTA.get()) % 24_000L);
+    // Time is server-authoritative; the client just waits for the synced clock update and ticks down locally.
     decrementRemainingTime();
   }
 }

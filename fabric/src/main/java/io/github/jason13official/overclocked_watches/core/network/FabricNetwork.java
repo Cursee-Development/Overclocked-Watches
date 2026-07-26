@@ -17,8 +17,8 @@ public class FabricNetwork {
 
     public static void registerPacketIDsAndReceivers() {
 
-      PayloadTypeRegistry.playC2S().register(DayNightC2SPayload.TYPE, DayNightC2SPayload.STREAM_CODEC);
-      PayloadTypeRegistry.playS2C().register(ConfigSyncPayload.TYPE, ConfigSyncPayload.STREAM_CODEC);
+      PayloadTypeRegistry.serverboundPlay().register(DayNightC2SPayload.TYPE, DayNightC2SPayload.STREAM_CODEC);
+      PayloadTypeRegistry.clientboundPlay().register(ConfigSyncPayload.TYPE, ConfigSyncPayload.STREAM_CODEC);
 
       ServerPlayNetworking.registerGlobalReceiver(DayNightC2SPayload.TYPE,
           (payload, context) -> DayNightC2SHandler.handle(context.server(), context.player()));

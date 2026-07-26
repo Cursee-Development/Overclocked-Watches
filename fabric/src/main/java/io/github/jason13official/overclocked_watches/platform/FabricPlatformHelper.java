@@ -1,31 +1,35 @@
 package io.github.jason13official.overclocked_watches.platform;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import dev.emi.trinkets.api.SlotReference;
-import dev.emi.trinkets.api.TrinketsApi;
-import dev.emi.trinkets.api.client.TrinketRenderer;
-import dev.emi.trinkets.api.client.TrinketRendererRegistry;
+import eu.pb4.trinkets.api.TrinketAttachment;
+import eu.pb4.trinkets.api.TrinketSlotAccess;
+import eu.pb4.trinkets.api.TrinketsApi;
+import eu.pb4.trinkets.api.client.TrinketRenderer;
+import eu.pb4.trinkets.api.client.TrinketRendererRegistry;
 import io.github.jason13official.overclocked_watches.api.client.renderer.IWatchRenderer;
 import io.github.jason13official.overclocked_watches.api.common.data.IEntityDataSaver;
+import io.github.jason13official.overclocked_watches.impl.client.item.renderer.WatchRenderer;
 import io.github.jason13official.overclocked_watches.impl.common.item.WatchTier;
 import io.github.jason13official.overclocked_watches.impl.common.registry.ModItems;
 import io.github.jason13official.overclocked_watches.platform.services.IPlatformHelper;
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import net.fabricmc.api.EnvType;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.PlayerModelType;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTab.Builder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -58,7 +62,7 @@ public class FabricPlatformHelper implements IPlatformHelper {
   @Override
   public Builder tabBuilder() {
 
-    return FabricItemGroup.builder();
+    return CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0);
   }
 
   @Override
@@ -84,34 +88,25 @@ public class FabricPlatformHelper implements IPlatformHelper {
   public boolean playerHasWatchEquipped(Player player, WatchTier tier) {
 
     Item watch = ModItems.getWatch(tier);
-    final AtomicBoolean foundWatch = new AtomicBoolean(false);
-    TrinketsApi.getTrinketComponent(player).ifPresent(trinketComponent -> {
-      if (trinketComponent.isEquipped(itemStack -> itemStack.getItem() == watch)) {
-        foundWatch.set(true);
-      }
-    });
-
-    return foundWatch.get();
+    TrinketAttachment attachment = TrinketsApi.getAttachment(player);
+    return attachment.isEquipped(watch);
   }
 
   @Override
   public ItemStack getEquippedWatch(Player player, WatchTier tier) {
 
     Item watch = ModItems.getWatch(tier);
-    AtomicReference<ItemStack> itemStackReference = new AtomicReference<ItemStack>(ItemStack.EMPTY);
-    TrinketsApi.getTrinketComponent(player)
-        .ifPresent(trinketComponent -> trinketComponent.getEquipped(watch).forEach(slotReferenceItemStackTuple -> itemStackReference.set(slotReferenceItemStackTuple.getB())));
-
-    return itemStackReference.get();
+    TrinketAttachment attachment = TrinketsApi.getAttachment(player);
+    return attachment.findFirst(watch).map(TrinketSlotAccess::get).orElse(ItemStack.EMPTY);
   }
 
   @Override
-  public Item getItemFromRL(ResourceLocation rl) {
-    return BuiltInRegistries.ITEM.get(rl);
+  public Item getItemFromRL(Identifier rl) {
+    return BuiltInRegistries.ITEM.getValue(rl);
   }
 
   @Override
-  public ResourceLocation getRLFromItem(Item item) {
+  public Identifier getRLFromItem(Item item) {
     return BuiltInRegistries.ITEM.getKey(item);
   }
 
@@ -123,10 +118,29 @@ public class FabricPlatformHelper implements IPlatformHelper {
   private record WatchTrinketRenderer(IWatchRenderer renderer) implements TrinketRenderer {
 
     @Override
-    public void render(ItemStack stack, SlotReference slotReference, EntityModel<? extends LivingEntity> entityModel, PoseStack poseStack, MultiBufferSource multiBufferSource, int light,
-        LivingEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-      int index = slotReference.index() + (slotReference.inventory().getSlotType().getGroup().equals("hand") ? 0 : 1);
-      renderer.render(stack, entity, index, poseStack, multiBufferSource, light, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
+    public void submit(ItemStack stack, TrinketSlotAccess slotReference, EntityModel<? extends LivingEntityRenderState> contextModel,
+        PoseStack poseStack, SubmitNodeCollector submit, int light, LivingEntityRenderState state,
+        float limbAngle, float limbDistance) {
+      int index = slotReference.index() + (slotReference.slotType().group().equals("hand") ? 0 : 1);
+      renderer.submit(stack, contextModel, index, poseStack, submit, light, state, limbAngle, limbDistance);
+    }
+
+    @Override
+    public void submitFirstPersonRightArm(ItemStack stack, TrinketSlotAccess slotReference, EntityModel<? extends LivingEntityRenderState> contextModel, ModelPart arm,
+        PoseStack poseStack, SubmitNodeCollector submit, int light, LocalPlayer player, boolean isMainHand) {
+      if (renderer instanceof WatchRenderer watchRenderer) {
+        boolean hasSlimArms = player.getSkin().model() == PlayerModelType.SLIM;
+        watchRenderer.renderFirstPersonArm(arm, poseStack, submit, light, hasSlimArms, HumanoidArm.RIGHT, stack.hasFoil());
+      }
+    }
+
+    @Override
+    public void submitFirstPersonLeftArm(ItemStack stack, TrinketSlotAccess slotReference, EntityModel<? extends LivingEntityRenderState> contextModel, ModelPart arm,
+        PoseStack poseStack, SubmitNodeCollector submit, int light, LocalPlayer player, boolean isMainHand) {
+      if (renderer instanceof WatchRenderer watchRenderer) {
+        boolean hasSlimArms = player.getSkin().model() == PlayerModelType.SLIM;
+        watchRenderer.renderFirstPersonArm(arm, poseStack, submit, light, hasSlimArms, HumanoidArm.LEFT, stack.hasFoil());
+      }
     }
   }
 }

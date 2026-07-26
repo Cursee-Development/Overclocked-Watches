@@ -4,7 +4,7 @@ import io.github.jason13official.overclocked_watches.OverclockedWatches;
 import io.github.jason13official.overclocked_watches.impl.common.item.WatchItem;
 import io.github.jason13official.overclocked_watches.impl.common.item.WatchTier;
 import java.util.function.BiConsumer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 
 public class ModItems {
@@ -13,7 +13,7 @@ public class ModItems {
   public static Item DIAMOND_WATCH; // = new WatchItem(WatchItem.Tier.DIAMOND);
   public static Item NETHERITE_WATCH; // = new WatchItem(WatchItem.Tier.NETHERITE);
 
-  public static void register(BiConsumer<Item, ResourceLocation> consumer) {
+  public static void register(BiConsumer<Item, Identifier> consumer) {
 
     GOLDEN_WATCH = new WatchItem(WatchTier.GOLDEN);
     DIAMOND_WATCH = new WatchItem(WatchTier.DIAMOND);

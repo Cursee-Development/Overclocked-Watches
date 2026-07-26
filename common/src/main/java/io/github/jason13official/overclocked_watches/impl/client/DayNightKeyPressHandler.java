@@ -14,9 +14,8 @@ public class DayNightKeyPressHandler {
 
     long pAmount = getTimeAdvanceAmount(player.getMainHandItem().getItem());
 
-    if (!ServerModConfig.USE_LONG_TIME_DELTA.get()) {
-      level.setDayTime(level.getDayTime() + pAmount);
-    } else {
+    // Time is server-authoritative; the server advances the clock once it receives our C2S packet.
+    if (ServerModConfig.USE_LONG_TIME_DELTA.get()) {
       TimeManager.CLIENT.addToRemainingTime((int) pAmount);
     }
 

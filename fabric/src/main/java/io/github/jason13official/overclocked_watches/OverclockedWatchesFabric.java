@@ -22,7 +22,7 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -74,7 +74,7 @@ public class OverclockedWatchesFabric implements ModInitializer {
     ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new ResourceReloadListener());
   }
 
-  public <T> void bind(Registry<T> registry, Consumer<BiConsumer<T, ResourceLocation>> source) {
+  public <T> void bind(Registry<T> registry, Consumer<BiConsumer<T, Identifier>> source) {
 
     source.accept((t, rl) -> Registry.register(registry, rl, t));
   }
@@ -82,7 +82,7 @@ public class OverclockedWatchesFabric implements ModInitializer {
   public static class ResourceReloadListener implements SimpleSynchronousResourceReloadListener {
 
     @Override
-    public ResourceLocation getFabricId() {
+    public Identifier getFabricId() {
 
       return OverclockedWatches.identifier(Constants.MOD_ID);
     }

@@ -13,14 +13,15 @@ import io.github.jason13official.overclocked_watches.impl.common.registry.ModPar
 import io.github.jason13official.overclocked_watches.impl.common.util.TimeManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+import net.fabricmc.fabric.api.client.particle.v1.ParticleProviderRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 
 public class OverclockedWatchesClientFabric implements ClientModInitializer {
@@ -33,17 +34,18 @@ public class OverclockedWatchesClientFabric implements ClientModInitializer {
 
     ClientPlayNetworking.registerGlobalReceiver(ConfigSyncPayload.TYPE, FabricConfigSyncClientHandler::registerS2CPacketHandler);
 
-    RendererLayers.register((layerLocation, supplier) -> EntityModelLayerRegistry.registerModelLayer(layerLocation, supplier::get));
+    RendererLayers.register((layerLocation, supplier) -> ModelLayerRegistry.registerModelLayer(layerLocation, supplier::get));
 
-    ModParticles.registerProviders((particleType, provider) -> ParticleFactoryRegistry.getInstance().register(particleType, provider::apply));
+    ModParticles.registerProviders((particleType, provider) -> ParticleProviderRegistry.getInstance().register(particleType, provider::apply));
 
     ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new TrinketRenderers());
 
-    dayNightKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+    KeyMapping.Category dayNightCategory = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(Constants.MOD_ID, "day_night"));
+    dayNightKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
         Constants.KEY_DAY_NIGHT,
         InputConstants.Type.KEYSYM,
         Math.toIntExact(ClientModConfig.DEFAULT_DAY_NIGHT_KEY.get()),
-        Constants.KEY_CATEGORY_DAY_NIGHT));
+        dayNightCategory));
 
     ClientTickEvents.END_CLIENT_TICK.register(client -> {
 
@@ -61,7 +63,7 @@ public class OverclockedWatchesClientFabric implements ClientModInitializer {
       }
     });
 
-    ClientTickEvents.START_WORLD_TICK.register(clientLevel -> {
+    ClientTickEvents.START_LEVEL_TICK.register(clientLevel -> {
       if (ServerModConfig.USE_LONG_TIME_DELTA.get() && TimeManager.CLIENT.shouldOperate()) {
         TimeManager.CLIENT.operate(clientLevel);
       }

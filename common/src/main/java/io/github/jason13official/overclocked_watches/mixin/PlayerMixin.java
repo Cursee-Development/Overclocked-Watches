@@ -73,12 +73,12 @@ public class PlayerMixin {
         }
         OverclockedWatchesUtil.addGrowthParticles(WatchTier.NETHERITE, level, blockPos, 8);
       } else if (foundDiamond) {
-        if (level.random.nextBoolean()) {
+        if (level.getRandom().nextBoolean()) {
           unique_$_forceGrowth(crop, blockState, level, blockPos);
         }
         OverclockedWatchesUtil.addGrowthParticles(WatchTier.DIAMOND, level, blockPos, 8);
       } else if (foundGolden) {
-        if (level.random.nextInt(10) == 1) {
+        if (level.getRandom().nextInt(10) == 1) {
           unique_$_forceGrowth(crop, blockState, level, blockPos);
         }
         OverclockedWatchesUtil.addGrowthParticles(WatchTier.GOLDEN, level, blockPos, 8);

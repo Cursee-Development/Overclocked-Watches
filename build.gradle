@@ -11,10 +11,9 @@ import me.lucko.jarrelocator.Relocation
 
 plugins {
     // see https://fabricmc.net/develop/ for new versions
-    id 'fabric-loom' version '1.10.1' apply false
+    id 'net.fabricmc.fabric-loom' version '1.15.5' apply false
     // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
-    // id 'net.neoforged.moddev' version '2.0.49-beta' apply false
-    id 'net.neoforged.moddev' version '2.0.74' apply false
+    id 'net.neoforged.moddev' version '2.0.141' apply false
 }
 
 // Force :fabric and :neoforge to configure so remapJar/jar
@@ -101,7 +100,7 @@ tasks.register('mergeJarsCustom', Jar) {
   group = 'distribution'
   description = 'Relocates :fabric and :neoforge output under loader-specific packages (same approach as Forgix) and merges them into build/merged/.'
 
-  def fabricJarTask = project(':fabric').tasks.named('remapJar')
+  def fabricJarTask = project(':fabric').tasks.named('jar')
   def neoforgeJarTask = project(':neoforge').tasks.named('jar')
 
   dependsOn(fabricJarTask, neoforgeJarTask)
