@@ -8,6 +8,7 @@ dependencies {
   annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
 
   modImplementation "curse.maven:monolib-968432:7974599"
+  modImplementation "top.theillusivec4.curios:curios-forge:5.8.1+1.20.1"
 }
 
 mixin {
@@ -20,11 +21,11 @@ mixin {
 legacyForge {
     version = "${minecraft_version}-${forge_version}"
 
-    validateAccessTransformers = true
+    validateAccessTransformers = false
 
     def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
     if (at.exists()) {
-        accessTransformers = ["src/main/resources/META-INF/accesstransformer.cfg"]
+        accessTransformers.from at.getAbsolutePath()
     }
     parchment {
         minecraftVersion = parchment_minecraft

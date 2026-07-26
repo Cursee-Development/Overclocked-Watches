@@ -20,7 +20,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 
 public class WatchItem extends Item {
 
@@ -49,7 +48,7 @@ public class WatchItem extends Item {
   }
 
   @Override
-  public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> tooltip, TooltipFlag tooltipFlag) {
+  public void appendHoverText(ItemStack itemStack, Level level, List<Component> tooltip, TooltipFlag tooltipFlag) {
 
     CompoundTag stackData = itemStack.getOrCreateTag();
     if (!stackData.contains(CHARGES_TAG, CompoundTag.TAG_INT)) {

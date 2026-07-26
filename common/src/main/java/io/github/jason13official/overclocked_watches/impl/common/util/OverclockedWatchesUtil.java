@@ -5,7 +5,6 @@ import io.github.jason13official.overclocked_watches.api.common.data.CoolDownRec
 import io.github.jason13official.overclocked_watches.api.common.data.IEntityDataSaver;
 import io.github.jason13official.overclocked_watches.api.common.data.IItemCooldowns;
 import io.github.jason13official.overclocked_watches.impl.common.ServerModConfig;
-import io.github.jason13official.overclocked_watches.impl.common.network.packet.DayNightC2SHandler;
 import io.github.jason13official.overclocked_watches.impl.common.item.WatchTier;
 import io.github.jason13official.overclocked_watches.impl.common.registry.ModItems;
 import io.github.jason13official.overclocked_watches.impl.common.registry.ModParticles;
@@ -80,11 +79,11 @@ public class OverclockedWatchesUtil {
 
   public static boolean consumeCharge(ItemStack itemInHand) {
     CompoundTag data = itemInHand.getOrCreateTag();
-    if (data.getInt(DayNightC2SHandler.CHARGES) == 0) {
+    if (data.getInt(WatchItem.CHARGES_TAG) == 0) {
       return false;
     }
-    int newCharges = data.getInt(DayNightC2SHandler.CHARGES) - 1;
-    data.putInt(DayNightC2SHandler.CHARGES, newCharges);
+    int newCharges = data.getInt(WatchItem.CHARGES_TAG) - 1;
+    data.putInt(WatchItem.CHARGES_TAG, newCharges);
     itemInHand.save(data);
     return true;
   }

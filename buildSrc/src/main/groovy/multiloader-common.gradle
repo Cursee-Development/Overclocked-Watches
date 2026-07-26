@@ -41,6 +41,10 @@ repositories {
         url = 'https://maven.blamejared.com'
     }
   maven { url "https://cursemaven.com" }
+  // trinkets
+  maven { url "https://maven.ladysnake.org/releases" }
+  // curios
+  maven { url 'https://maven.theillusivec4.top/' }
 }
 
 // Declare capabilities on the outgoing configurations.
@@ -83,6 +87,7 @@ processResources {
     var expandProps = ['version'                       : version,
                        'group'                         : project.group, //Else we target the task's group.
                        'minecraft_version'             : minecraft_version,
+                       'minecraft_version_range'       : minecraft_version_range,
                        'fabric_minecraft_version_range': fabric_minecraft_version_range,
                        'forge_minecraft_version_range' : forge_minecraft_version_range,
                        'fabric_version'                : fabric_version,
@@ -94,6 +99,7 @@ processResources {
                        'license'                       : license,
                        'description'                   : project.description,
                        "forge_version"                 : forge_version,
+                       "forge_version_range"           : forge_version_range,
                        "forge_loader_version_range"    : forge_loader_version_range,
                        'credits'                       : credits,
                        'java_version'                  : java_version]
