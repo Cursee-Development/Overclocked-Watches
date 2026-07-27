@@ -1,6 +1,7 @@
 package io.github.jason13official.overclocked_watches.impl.common.item;
 
 import io.github.jason13official.overclocked_watches.Constants;
+import io.github.jason13official.overclocked_watches.OverclockedWatches;
 import io.github.jason13official.overclocked_watches.api.common.data.WatchItemData;
 import io.github.jason13official.overclocked_watches.impl.common.registry.ModDataComponents;
 import io.github.jason13official.overclocked_watches.impl.common.registry.ModItems;
@@ -8,7 +9,9 @@ import io.github.jason13official.overclocked_watches.impl.common.util.Overclocke
 import io.github.jason13official.overclocked_watches.platform.Services;
 import java.util.function.Consumer;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -30,8 +33,18 @@ public class WatchItem extends Item {
   private final WatchTier tier;
 
   public WatchItem(WatchTier tier) {
-    super(new Properties().durability(tier.getItemDurability()).component(ModDataComponents.CHARGES, tier.getWatchCharges()));
+    super(new Properties().durability(tier.getItemDurability()).component(ModDataComponents.CHARGES, tier.getWatchCharges()).setId(keyFromTier(tier)));
     this.tier = tier;
+  }
+
+  /// i'm too lazy to refactor rn
+  private static ResourceKey<Item> keyFromTier(WatchTier tier) {
+
+    return switch (tier) {
+      case GOLDEN -> ResourceKey.create(Registries.ITEM, OverclockedWatches.identifier("golden_watch"));
+      case DIAMOND -> ResourceKey.create(Registries.ITEM, OverclockedWatches.identifier("diamond_watch"));
+      case NETHERITE -> ResourceKey.create(Registries.ITEM, OverclockedWatches.identifier("netherite_watch"));
+    };
   }
 
   /// Helper method to reduce spamming similar lines, apply same cooldown for all watches

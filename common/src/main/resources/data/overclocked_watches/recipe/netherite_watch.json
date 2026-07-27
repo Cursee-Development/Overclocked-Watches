@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": "minecraft:clock",
+    "S": "minecraft:string",
+    "L": "minecraft:leather",
+    "#": "minecraft:netherite_ingot"
+  },
+  "pattern": [
+    "SCS",
+    "# #",
+    "SLS"
+  ],
+  "result": {
+    "id": "overclocked_watches:netherite_watch"
+  },
+  "show_notification": true
+}

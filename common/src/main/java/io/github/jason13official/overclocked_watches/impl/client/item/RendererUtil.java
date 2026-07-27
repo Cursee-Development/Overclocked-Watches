@@ -29,8 +29,10 @@ public abstract class RendererUtil {
   public static MeshDefinition createEmptyArms(CubeListBuilder leftArm, CubeListBuilder rightArm, boolean hasSlimArms) {
     MeshDefinition mesh = HumanoidModel.createMesh(CubeDeformation.NONE, 0);
 
-    mesh.getRoot().addOrReplaceChild("left_arm", CubeListBuilder.create(), PartPose.ZERO);
-    mesh.getRoot().addOrReplaceChild("right_arm", CubeListBuilder.create(), PartPose.ZERO);
+    // Match HumanoidModel's arm anchor points (shoulder position), not PartPose.ZERO;
+    // first-person resets to this bind pose directly, it needs to line up with what vanilla expects
+    mesh.getRoot().addOrReplaceChild("left_arm", CubeListBuilder.create(), PartPose.offset(5.0F, 2.0F, 0.0F));
+    mesh.getRoot().addOrReplaceChild("right_arm", CubeListBuilder.create(), PartPose.offset(-5.0F, 2.0F, 0.0F));
 
     float armWidth = hasSlimArms ? 3 : 4;
     mesh.getRoot().getChild("left_arm").addOrReplaceChild(

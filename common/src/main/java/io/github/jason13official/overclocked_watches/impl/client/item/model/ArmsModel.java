@@ -26,8 +26,16 @@ public class ArmsModel extends HumanoidModel<HumanoidRenderState> {
     return new ArmsModel(RendererUtil.bakeLayer(RendererLayers.watch(tier, hasSlimArms)));
   }
 
+  /// Mirrors the old HumanoidModel#setAllVisible: only toggles the named top-level
+  /// parts, so nested children (e.g. the watch geometry hanging off left_arm/right_arm) keep
+  /// their own default visibility instead of being hidden along with everything else.
   public void prepareArm(HumanoidArm handSide) {
-    this.allParts().forEach(part -> part.visible = false);
-    getArm(handSide).visible = true;
+    head.visible = false;
+    hat.visible = false;
+    body.visible = false;
+    leftLeg.visible = false;
+    rightLeg.visible = false;
+    leftArm.visible = handSide == HumanoidArm.LEFT;
+    rightArm.visible = handSide == HumanoidArm.RIGHT;
   }
 }

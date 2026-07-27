@@ -2,7 +2,6 @@ package io.github.jason13official.overclocked_watches.platform;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.jason13official.overclocked_watches.api.client.renderer.IWatchRenderer;
-import io.github.jason13official.overclocked_watches.impl.client.item.renderer.WatchRenderer;
 import io.github.jason13official.overclocked_watches.impl.common.item.WatchTier;
 import io.github.jason13official.overclocked_watches.impl.common.registry.ModItems;
 import io.github.jason13official.overclocked_watches.platform.services.IPlatformHelper;
@@ -11,19 +10,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
-import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTab.Builder;
 import net.minecraft.world.item.Item;
@@ -144,22 +139,6 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
       @SuppressWarnings("unchecked")
       EntityModel<? extends LivingEntityRenderState> contextModel = (EntityModel<? extends LivingEntityRenderState>) renderLayerParent.getModel();
       renderer.submit(stack, contextModel, slotContext.index(), poseStack, submitNodeCollector, packedLight, renderState, yRotation, xRotation);
-    }
-
-    @Override
-    public void renderFirstPersonHand(
-        ItemStack stack,
-        SlotContext slotContext,
-        HumanoidArm arm,
-        PoseStack poseStack,
-        SubmitNodeCollector submitNodeCollector,
-        AvatarRenderState avatarRenderState,
-        AbstractClientPlayer clientPlayer,
-        int packedLight) {
-      if (renderer instanceof WatchRenderer watchRenderer) {
-        boolean hasSlimArms = clientPlayer.getSkin().model() == PlayerModelType.SLIM;
-        watchRenderer.renderFirstPersonArm(poseStack, submitNodeCollector, packedLight, hasSlimArms, arm, stack.hasFoil());
-      }
     }
   }
 }

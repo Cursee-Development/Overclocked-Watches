@@ -1,5 +1,6 @@
 package io.github.jason13official.overclocked_watches;
 
+import io.github.jason13official.overclocked_watches.client.ArmRenderHandler;
 import io.github.jason13official.overclocked_watches.client.KeyInputHandlerForge;
 import io.github.jason13official.overclocked_watches.core.network.ForgeNetwork;
 import io.github.jason13official.overclocked_watches.impl.client.DayNightKeyPressHandler;
@@ -44,6 +45,8 @@ public class OverclockedWatchesClientNeoForge {
     modEventBus.addListener(this::onAddEntityRendererLayers);
     modEventBus.addListener(this::onRegisterParticleProviders);
     modEventBus.addListener(this::onRegisterKeyMappings);
+
+    ArmRenderHandler.setup();
 
     NeoForge.EVENT_BUS.addListener(this::onKeyInput);
     NeoForge.EVENT_BUS.addListener((Consumer<ClientTickEvent.Pre>) event -> {

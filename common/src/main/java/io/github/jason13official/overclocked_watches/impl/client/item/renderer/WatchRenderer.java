@@ -8,10 +8,12 @@ import io.github.jason13official.overclocked_watches.impl.common.registry.ModIte
 import io.github.jason13official.overclocked_watches.platform.Services;
 import java.util.Locale;
 import java.util.function.Function;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.ArmedEntityRenderState;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
@@ -113,31 +115,27 @@ public class WatchRenderer implements IWatchRenderer {
     poseStack.popPose();
   }
 
-  public final void renderFirstPersonArm(ModelPart vanillaArm, PoseStack matrixStack, SubmitNodeCollector submit, int light, boolean hasSlimArms, HumanoidArm side, boolean hasFoil) {
+  /// The PoseStack is already positioned at the vanilla arm by the caller,
+  /// we just need our own arm posed and rendered.
+  public final void renderFirstPersonArm(PoseStack poseStack, SubmitNodeCollector submit, int light, AbstractClientPlayer player, HumanoidArm side, boolean hasFoil) {
+    if (player.isSpectator()) {
+      return;
+    }
 
+    AvatarRenderer<AbstractClientPlayer> playerRenderer = Minecraft.getInstance().getEntityRenderDispatcher().getPlayerRenderer(player);
+    AvatarRenderState renderState = playerRenderer.createRenderState(player, Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true));
+
+    boolean hasSlimArms = hasSlimArms(renderState);
     ArmsModel model = getModel(hasSlimArms);
-    model.prepareArm(side);
-    ModelPart ourArm = side == HumanoidArm.LEFT ? model.leftArm : model.rightArm;
-    ourArm.resetPose();
 
-    matrixStack.pushPose();
-    vanillaArm.translateAndRotate(matrixStack);
-    matrixStack.translate(side == HumanoidArm.RIGHT ? -0.0625F : 0.0625F, 0.625F, 0.0F);
+    // animate, then reset the arms to their default first-person position (see AvatarRenderer::renderHand)
+    model.setupAnim(renderState);
+    model.leftArm.resetPose();
+    model.rightArm.resetPose();
+    model.leftArm.zRot = -0.1F;
+    model.rightArm.zRot = 0.1F;
 
     RenderType renderType = model.renderType(getTexture(hasSlimArms));
-    submit.submitModelPart(model.root(), matrixStack, renderType, light, OverlayTexture.NO_OVERLAY, null, false, hasFoil);
-    matrixStack.popPose();
-  }
-
-  /// Variant for platforms (e.g. Curios) that already position the PoseStack at the arm before calling in.
-  public final void renderFirstPersonArm(PoseStack matrixStack, SubmitNodeCollector submit, int light, boolean hasSlimArms, HumanoidArm side, boolean hasFoil) {
-
-    ArmsModel model = getModel(hasSlimArms);
-    model.prepareArm(side);
-    ModelPart ourArm = side == HumanoidArm.LEFT ? model.leftArm : model.rightArm;
-    ourArm.resetPose();
-
-    RenderType renderType = model.renderType(getTexture(hasSlimArms));
-    submit.submitModelPart(model.root(), matrixStack, renderType, light, OverlayTexture.NO_OVERLAY, null, false, hasFoil);
+    submit.submitModelPart(side == HumanoidArm.LEFT ? model.leftArm : model.rightArm, poseStack, renderType, light, OverlayTexture.NO_OVERLAY, null, false, hasFoil);
   }
 }
