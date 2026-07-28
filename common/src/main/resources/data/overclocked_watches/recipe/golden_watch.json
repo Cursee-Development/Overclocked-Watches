@@ -21,7 +21,8 @@
     "SLS"
   ],
   "result": {
-    "item": "overclocked_watches:golden_watch"
+    "id": "overclocked_watches:golden_watch",
+    "count": 1
   },
   "show_notification": true
 }

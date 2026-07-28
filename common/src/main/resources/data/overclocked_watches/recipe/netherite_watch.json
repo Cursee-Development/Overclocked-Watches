@@ -21,7 +21,8 @@
     "SLS"
   ],
   "result": {
-    "item": "overclocked_watches:netherite_watch"
+    "id": "overclocked_watches:netherite_watch",
+    "count": 1
   },
   "show_notification": true
 }

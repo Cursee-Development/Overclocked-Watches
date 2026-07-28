@@ -21,7 +21,8 @@
     "SLS"
   ],
   "result": {
-    "item": "overclocked_watches:diamond_watch"
+    "id": "overclocked_watches:diamond_watch",
+    "count": 1
   },
   "show_notification": true
 }
